@@ -201,31 +201,28 @@ export async function answerRunQuestion(
       .join("\n\n");
 
   if (ctx.credential && packText) {
-    const { completeText, chatAnswerSchema, extractJson } = await import("@/lib/ai/client");
+    const { completeJSON, chatAnswerSchema } = await import("@/lib/ai/client");
     const { CHAT_GROUNDING_TEMPLATE } = await import("@/lib/ai/prompts");
     try {
-      const raw = await completeText({
+      const { data: d } = await completeJSON({
         credential: ctx.credential,
         system: CHAT_GROUNDING_TEMPLATE(packText),
         prompt:
           history.slice(-6).map((h) => `${h.role.toUpperCase()}: ${h.content}`).join("\n") +
           `\nUSER: ${question}`,
+        schema: chatAnswerSchema,
         maxTokens: 1200,
       });
-      const parsed = chatAnswerSchema.safeParse(extractJson(raw));
-      if (parsed.success) {
-        const d = parsed.data;
-        if (!d.sufficientEvidence) {
-          return {
-            content: `The ingested evidence does not cover this question. ${d.answer}\n\nYou may need to upload additional documents covering this area and re-run the analysis.`,
-            citations: [],
-          };
-        }
-        const cited = dedupeCitations(
-          d.citations.map((c) => citationIndex.get(c.ref)).filter((c): c is RunChatCitation => c != null)
-        );
-        return { content: d.answer, citations: cited };
+      if (!d.sufficientEvidence) {
+        return {
+          content: `The ingested evidence does not cover this question. ${d.answer}\n\nYou may need to upload additional documents covering this area and re-run the analysis.`,
+          citations: [],
+        };
       }
+      const cited = dedupeCitations(
+        d.citations.map((c) => citationIndex.get(c.ref)).filter((c): c is RunChatCitation => c != null)
+      );
+      return { content: d.answer, citations: cited };
     } catch (e) {
       // surface the real reason the model path failed (bad key, dead model, timeout…)
       modelError = e instanceof Error ? e.message.slice(0, 200) : "model call failed";

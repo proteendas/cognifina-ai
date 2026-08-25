@@ -26,7 +26,7 @@ export async function listProviderModels(
   return models;
 }
 
-/** Best-effort default: first model the key can access, or "" when none. */
+/** Best-effort default: the most capable model the key can access. */
 export async function resolveDefaultModel(
   api: ProviderSpec["api"],
   baseUrl: string,
@@ -34,10 +34,21 @@ export async function resolveDefaultModel(
 ): Promise<string> {
   try {
     const models = await listProviderModels(api, baseUrl, key);
-    return models[0] ?? "";
+    return pickDefaultModel(models);
   } catch {
     return "";
   }
+}
+
+/** Non-chat / tiny models that must never be auto-selected. */
+const AVOID = /(whisper|orpheus|tts|embed|guard|prompt-guard|allam|safeguard|-2-7b|-3b|-1b|vision)/i;
+/** Capability hints, strongest first-match wins. */
+const PREFERRED = /(gpt-oss-120b|gpt-4|claude-(3|4|opus|sonnet)|-70b|-120b|-240b|k2|large-latest|compound|qwen3|gemini-2(\.\d)?-(pro|flash)|deepseek)/i;
+
+export function pickDefaultModel(models: string[]): string {
+  const usable = models.filter((m) => !AVOID.test(m));
+  const pool = usable.length > 0 ? usable : models;
+  return pool.find((m) => PREFERRED.test(m)) ?? pool[0] ?? "";
 }
 
 async function fetchModels(api: ProviderSpec["api"], base: string, key: string): Promise<string[]> {
