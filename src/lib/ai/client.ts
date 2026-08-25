@@ -64,6 +64,8 @@ async function callOpenAICompatible(
   jsonMode: boolean
 ): Promise<string> {
   const baseUrl = cred.baseUrl || PROVIDERS[cred.provider].defaultBaseUrl!;
+  // Reasoning models (gpt-oss etc.) burn completion tokens thinking — keep it low
+  const isReasoning = /gpt-oss|deepseek-r1|qwen3/i.test(cred.model);
   const res = await fetch(`${baseUrl.replace(/\/$/, "")}/chat/completions`, {
     method: "POST",
     headers: {
@@ -74,7 +76,10 @@ async function callOpenAICompatible(
       model: cred.model,
       temperature: 0,
       max_tokens: maxTokens,
-      messages,
+      messages: isReasoning
+        ? [{ role: "system", content: "Reasoning: low" }, ...messages]
+        : messages,
+      ...(isReasoning ? { reasoning_effort: "low" } : {}),
       ...(jsonMode && cred.provider !== "ollama" ? { response_format: { type: "json_object" } } : {}),
     }),
     signal: AbortSignal.timeout(55_000),
@@ -83,9 +88,20 @@ async function callOpenAICompatible(
     const body = await res.text().catch(() => "");
     throw new ProviderError(`HTTP ${res.status}: ${body.slice(0, 300)}`, cred.provider);
   }
-  const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+  const data = (await res.json()) as {
+    choices?: { message?: { content?: string; reasoning?: string } }[];
+  };
   const content = data.choices?.[0]?.message?.content;
-  if (!content) throw new ProviderError("Empty completion", cred.provider);
+  if (!content) {
+    const reasoning = data.choices?.[0]?.message?.reasoning;
+    if (reasoning) {
+      throw new ProviderError(
+        "Model spent its entire token budget on reasoning — increase max tokens or pick a non-reasoning model",
+        cred.provider
+      );
+    }
+    throw new ProviderError("Empty completion", cred.provider);
+  }
   return content;
 }
 
@@ -228,7 +244,7 @@ export async function testCredential(cred: ResolvedCredential): Promise<{ ok: bo
         { role: "system", content: "Reply with exactly one word: OK" },
         { role: "user", content: "ping" },
       ],
-      16,
+      600, // reasoning models need headroom to think before answering
       false
     );
     return { ok: true, detail: text.trim().slice(0, 40) || "ok" };
