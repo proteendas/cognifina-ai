@@ -107,8 +107,10 @@ scripts/e2e-fixture.mjs         # deterministic test documents used for validati
 
 ## Documentation
 
+- **[docs/OVERVIEW.md](docs/OVERVIEW.md)** — what Cognifina is, who it's for, the problems it solves, and who it helps
 - **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — system diagrams (Mermaid), data model, engine math, tech-stack rationale with pinned versions, security model.
 - **[docs/USER_GUIDE.md](docs/USER_GUIDE.md)** — end-to-end walkthrough: accounts, BYOK setup, running analyses, reading the dashboard, entity maps, forensic ledger, evidence chat, troubleshooting.
+- **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** — developer deployment guide: environments, Vercel + Postgres setup, super-admin bootstrap, operations.
 
 ## Scope notes & honest limitations
 
