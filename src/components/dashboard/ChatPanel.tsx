@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Quote, Send, Sparkles, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
+import { Markdown } from "@/components/ui/markdown";
 import { api } from "@/lib/client";
 import type { ChatCitationDto, ChatMessageDto } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -103,7 +104,11 @@ export function ChatPanel({
                     : "border border-line bg-paper-2 text-ink-2"
                 )}
               >
-                <p className={cn("whitespace-pre-wrap", m.role === "assistant" && "font-secondary")}>{m.content}</p>
+                {m.role === "assistant" ? (
+                  <Markdown>{m.content}</Markdown>
+                ) : (
+                  <p className="whitespace-pre-wrap">{m.content}</p>
+                )}
               </div>
               {m.citations.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">

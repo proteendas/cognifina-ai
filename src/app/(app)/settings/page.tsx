@@ -93,7 +93,12 @@ function ProviderCard({
     setModelState("loading");
     setModelError(null);
     try {
-      const res = await api.settings.models({ provider: provider.id, apiKey: key || undefined, baseUrl: url ?? baseUrl });
+      const effectiveUrl = (url ?? baseUrl).trim();
+      const res = await api.settings.models({
+        provider: provider.id,
+        apiKey: key?.trim() || undefined,
+        baseUrl: effectiveUrl || undefined,
+      });
       if (res.source === "live" && res.models.length > 0) {
         setModelOptions(res.models);
         setModelState("live");
@@ -124,14 +129,19 @@ function ProviderCard({
     setStatus(null);
     try {
       if (testFirst) {
-        const res = await api.settings.testKey({ provider: provider.id, apiKey: apiKey || undefined, baseUrl: baseUrl || undefined, model });
+        const res = await api.settings.testKey({
+          provider: provider.id,
+          apiKey: apiKey.trim() || undefined,
+          baseUrl: baseUrl.trim() || undefined,
+          model: model.trim() || undefined,
+        });
         if (!res.ok) {
           setStatus({ ok: false, msg: res.detail });
           return;
         }
         setStatus({ ok: true, msg: `test passed · ${res.detail}` });
       }
-      await api.settings.saveKey(provider.id, apiKey, baseUrl || undefined, model);
+      await api.settings.saveKey(provider.id, apiKey.trim(), baseUrl.trim() || undefined, model.trim() || undefined);
       setApiKey("");
       onSaved();
       if (!testFirst) setStatus({ ok: true, msg: "key stored" });

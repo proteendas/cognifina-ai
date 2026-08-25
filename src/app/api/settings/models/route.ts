@@ -12,7 +12,12 @@ import { listProviderModels } from "@/lib/ai/discover";
 const schema = z.object({
   provider: z.string().refine((p) => p in PROVIDERS),
   apiKey: z.string().max(400).optional(),
-  baseUrl: z.string().url().max(300).optional().nullable(),
+  baseUrl: z
+    .string()
+    .max(300)
+    .optional()
+    .nullable()
+    .transform((v) => v || undefined),
 });
 
 /**

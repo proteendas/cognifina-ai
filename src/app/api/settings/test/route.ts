@@ -11,7 +11,11 @@ import { keyHint } from "@/lib/auth/vault";
 const testSchema = z.object({
   provider: z.string().refine((p) => p in PROVIDERS),
   apiKey: z.string().max(400).optional(),
-  baseUrl: z.string().url().max(300).optional(),
+  baseUrl: z
+    .string()
+    .max(300)
+    .optional()
+    .transform((v) => v || undefined),
   model: z.string().max(120).optional(),
 });
 
@@ -32,7 +36,7 @@ export async function POST(request: Request) {
         provider: provider as ProviderId,
         apiKey,
         baseUrl: base,
-        model: model ?? (await resolveDefaultModel(spec.api, base ?? "", apiKey)),
+        model: model || (await resolveDefaultModel(spec.api, base ?? "", apiKey)),
       };
     } else {
       const resolved = await resolveCredential({ userId: user.id });

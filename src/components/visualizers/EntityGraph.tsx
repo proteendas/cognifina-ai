@@ -89,8 +89,11 @@ export function EntityGraph({
     }
 
     const byDepth = new Map<number, EntityNodeDto[]>();
+    const maxKnownDepth = Math.max(0, ...[...depth.values()].filter((v) => v < 99));
     for (const n of nodes) {
-      const d = depth.get(n.key) ?? 99;
+      // unreachable nodes (no edge to the subject) sit next to the graph,
+      // never 99 columns away
+      const d = Math.min(depth.get(n.key) ?? 99, maxKnownDepth + 1);
       byDepth.set(d, [...(byDepth.get(d) ?? []), n]);
     }
 
