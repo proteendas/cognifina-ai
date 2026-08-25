@@ -188,6 +188,7 @@ export async function answerRunQuestion(
     : "";
 
   const citationIndex = new Map<string, RunChatCitation>();
+  let modelError: string | null = null;
   const packText =
     findingContext +
     metricContext +
@@ -225,8 +226,9 @@ export async function answerRunQuestion(
         );
         return { content: d.answer, citations: cited };
       }
-    } catch {
-      // fall through to extractive mode
+    } catch (e) {
+      // surface the real reason the model path failed (bad key, dead model, timeout…)
+      modelError = e instanceof Error ? e.message.slice(0, 200) : "model call failed";
     }
   }
 
@@ -242,6 +244,9 @@ export async function answerRunQuestion(
   // No lexical passage hits, but the engines produced authoritative outputs —
   // answer deterministically from findings/metrics instead of refusing.
   if (top.length === 0) {
+    const reason = ctx.credential
+      ? `The connected model call failed (${modelError ?? "unknown error"}).`
+      : "No language model is connected to this workspace.";
     const topFindings = rankedFindings.slice(0, 5);
     const findingsList = topFindings
       .map((f) => `• [${f.ref}] ${f.severity.toUpperCase()} — ${f.title}: ${f.description}`)
@@ -250,7 +255,7 @@ export async function answerRunQuestion(
       ? `\n\nComputed metrics for reference: ${metricRows.map((m) => `${m.displayName} (${m.verdict})`).join("; ")}.`
       : "";
     return {
-      content: `No language model is connected to this workspace, so here is a deterministic summary from the run's computed results:\n\n${findingsList}${metricSummary}`,
+      content: `${reason} Here is a deterministic summary from the run's computed results:\n\n${findingsList}${metricSummary}`,
       citations: [],
     };
   }
@@ -258,6 +263,9 @@ export async function answerRunQuestion(
   const metricSummary = metricRows.length
     ? `\n\nComputed metrics for reference: ${metricRows.map((m) => `${m.displayName} (${m.verdict})`).join("; ")}.`
     : "";
+  const modelNote = ctx.credential
+    ? `The connected model call failed (${modelError ?? "unknown error"}), so this is a strictly extractive answer`
+    : "No language model is connected to this workspace, so this is a strictly extractive answer";
   return {
     content: `No language model is connected to this workspace, so here is a strictly extractive answer drawn from the highest-scoring passages:\n\n${excerptList.join("\n\n")}${metricSummary}`,
     citations: dedupeCitations(top.slice(0, 4).map((s) => buildCitation(s.block, docNameById))),

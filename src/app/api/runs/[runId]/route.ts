@@ -13,9 +13,16 @@ import {
   chatMessages,
 } from "@/db/schema";
 import { and, eq, asc } from "drizzle-orm";
+import { z } from "zod";
 import { requireUser, UnauthorizedError } from "@/lib/auth/session";
+import { recordAudit } from "@/lib/audit";
 
 export const maxDuration = 60;
+
+const patchSchema = z.object({
+  entityName: z.string().max(200).optional(),
+  periodLabel: z.string().max(120).optional(),
+});
 
 export async function GET(_request: Request, { params }: { params: { runId: string } }) {
   try {
@@ -134,6 +141,32 @@ export async function GET(_request: Request, { params }: { params: { runId: stri
     if (err instanceof UnauthorizedError) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     console.error("[runs/:id.GET]", err);
     return NextResponse.json({ error: "Failed to load run" }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: Request, { params }: { params: { runId: string } }) {
+  try {
+    const user = await requireUser();
+    const parsed = patchSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    const update: Record<string, string> = {};
+    if (parsed.data.entityName !== undefined) update.entityName = parsed.data.entityName.trim().slice(0, 200);
+    if (parsed.data.periodLabel !== undefined) update.periodLabel = parsed.data.periodLabel.trim().slice(0, 120);
+    if (Object.keys(update).length === 0) return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
+
+    const [updated] = await db
+      .update(runs)
+      .set(update)
+      .where(and(eq(runs.id, params.runId), eq(runs.userId, user.id)))
+      .returning({ id: runs.id, entityName: runs.entityName, periodLabel: runs.periodLabel });
+    if (!updated) return NextResponse.json({ error: "Run not found" }, { status: 404 });
+
+    await recordAudit(user.id, "run.updated", `${updated.entityName || "run"} · ${updated.periodLabel || "no period"}`);
+    return NextResponse.json({ run: updated });
+  } catch (err) {
+    if (err instanceof UnauthorizedError) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    console.error("[runs/:id.PATCH]", err);
+    return NextResponse.json({ error: "Failed to update run" }, { status: 500 });
   }
 }
 

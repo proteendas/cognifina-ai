@@ -84,6 +84,11 @@ export const api = {
     list: () => request<{ runs: RunListItem[] }>("/runs"),
     create: (form: FormData) => request<{ runId: string }>("/runs", { method: "POST", body: form }),
     get: (runId: string) => request<RunDetailDto>(`/runs/${runId}`),
+    update: (runId: string, payload: { entityName?: string; periodLabel?: string }) =>
+      request<{ run: { id: string; entityName: string; periodLabel: string } }>(`/runs/${runId}`, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      }),
     advance: (runId: string) =>
       request<{ status: string; currentStage: number; progress: number; stageLabel: string; totalStages: number }>(
         `/runs/${runId}/advance`,

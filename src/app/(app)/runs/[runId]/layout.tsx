@@ -2,9 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Loader2, PencilLine, Save, X } from "lucide-react";
 import { RunProvider, useRun } from "@/components/dashboard/RunContext";
 import { RiskGauge } from "@/components/visualizers/RiskGauge";
+import { Button } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/sheet";
+import { Input, Label } from "@/components/ui/input";
+import { api } from "@/lib/client";
 import { cn } from "@/lib/utils";
 
 const TABS = [
@@ -48,9 +53,12 @@ function RunChrome({ runId, children }: { runId: string; children: React.ReactNo
           <p className="truncate text-[11px] font-medium uppercase tracking-wider text-ink-4">
             {data?.run.workflowName ?? "Run"} · {data?.run.periodLabel || data?.run.entityName || "—"}
           </p>
-          <h1 className="mt-1 truncate text-xl font-bold tracking-tight text-ink">
-            {data?.run.entityName || "Forensic analysis"}
-          </h1>
+          <div className="mt-1 flex items-center gap-2">
+            <h1 className="truncate text-xl font-bold tracking-tight text-ink">
+              {data?.run.entityName || "Forensic analysis"}
+            </h1>
+            {data && <EditRunButton />}
+          </div>
           {data?.run.modelProvider && (
             <p className="tnum mt-1 truncate font-secondary text-[11.5px] text-ink-4">
               model: {data.run.modelProvider}/{data.run.modelName}
@@ -88,5 +96,72 @@ function RunChrome({ runId, children }: { runId: string; children: React.ReactNo
 
       <div className="mt-5">{children}</div>
     </div>
+  );
+}
+
+/** Pencil beside the run title — edit entity name & period label at any time. */
+function EditRunButton() {
+  const { data, refresh } = useRun();
+  const [open, setOpen] = useState(false);
+  const [entityName, setEntityName] = useState(data?.run.entityName ?? "");
+  const [periodLabel, setPeriodLabel] = useState(data?.run.periodLabel ?? "");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const openDialog = () => {
+    setEntityName(data?.run.entityName ?? "");
+    setPeriodLabel(data?.run.periodLabel ?? "");
+    setError(null);
+    setOpen(true);
+  };
+
+  const save = async () => {
+    if (!data) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await api.runs.update(data.run.id, { entityName, periodLabel });
+      await refresh();
+      setOpen(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to update");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <>
+      <button
+        onClick={openDialog}
+        aria-label="Edit entity name and period"
+        title="Edit entity name & period"
+        className="pressable flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-ink-4 transition-colors hover:bg-paper-2 hover:text-accent"
+      >
+        <PencilLine size={14} />
+      </button>
+
+      <Dialog open={open} onClose={() => !busy && setOpen(false)} title="Edit run details">
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="edit-entity">Entity under review</Label>
+            <Input id="edit-entity" value={entityName} onChange={(e) => setEntityName(e.target.value)} maxLength={200} placeholder="Acme Holdings Pvt Ltd" className="mt-1.5" />
+          </div>
+          <div>
+            <Label htmlFor="edit-period">Period / label</Label>
+            <Input id="edit-period" value={periodLabel} onChange={(e) => setPeriodLabel(e.target.value)} maxLength={120} placeholder="FY 2024-25 · Buy-side DD" className="mt-1.5" />
+          </div>
+          {error && <p className="font-secondary text-[12.5px] text-danger">{error}</p>}
+        </div>
+        <div className="mt-5 flex justify-end gap-2">
+          <Button variant="secondary" onClick={() => setOpen(false)} disabled={busy}>
+            <X size={14} /> Cancel
+          </Button>
+          <Button onClick={() => void save()} disabled={busy}>
+            {busy ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} Save
+          </Button>
+        </div>
+      </Dialog>
+    </>
   );
 }

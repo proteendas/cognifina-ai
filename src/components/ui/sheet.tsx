@@ -43,7 +43,7 @@ export function Sheet({
           />
           <motion.div
             className={cn(
-              "absolute inset-y-4 right-4 flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-pop",
+              "absolute inset-y-4 right-4 z-10 flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-pop",
               wide ? "w-[min(720px,calc(100vw-2rem))]" : "w-[min(480px,calc(100vw-2rem))]"
             )}
             initial={{ x: "110%", opacity: 0.6 }}
@@ -85,14 +85,14 @@ export function Dialog({
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <motion.div
-            className="absolute inset-0 bg-[#1a1d1f]/40"
+            className="absolute inset-0 z-0 bg-[#1a1d1f]/40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
           <motion.div
-            className="w-full max-w-md rounded-2xl border border-line bg-surface p-6 shadow-pop"
+            className="relative z-10 w-full max-w-md rounded-2xl border border-line bg-surface p-6 shadow-pop"
             initial={{ scale: 0.94, y: 12, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.96, y: 8, opacity: 0 }}
