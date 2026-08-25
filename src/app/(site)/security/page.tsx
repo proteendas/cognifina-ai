@@ -2,6 +2,7 @@
 
 import { CheckCircle2, Database, EyeOff, FileKey2, KeyRound, Lock, RefreshCcw, ServerCog } from "lucide-react";
 import { CtaBand, InfoCard, PageHero, Reveal, SectionShell } from "@/components/marketing/Blocks";
+import { SUPPORT_EMAIL } from "@/components/marketing/MarketingChrome";
 
 const PILLARS = [
   {
@@ -43,10 +44,10 @@ export default function SecurityPage() {
         title={<>Security is an architecture, not a policy.</>}
         sub="Cognifina is designed so the sensitive parts — your keys and your client documents — stay inside infrastructure you control."
       />
-      <SectionShell className="!pt-10">
+      <SectionShell className="!pt-8">
         <div className="grid gap-4 sm:grid-cols-2">
           {PILLARS.map((p, i) => (
-            <Reveal key={p.title} delay={i * 0.04}>
+            <Reveal key={p.title} delay={i * 0.04} className="h-full">
               <InfoCard icon={<p.icon size={18} />} title={p.title}>
                 {p.body}
               </InfoCard>
@@ -55,15 +56,15 @@ export default function SecurityPage() {
         </div>
 
         <Reveal delay={0.08}>
-          <div className="material-thick mt-6 rounded-[24px] p-7">
+          <div className="mt-6 rounded-2xl border border-line bg-surface p-7 shadow-soft">
             <div className="flex items-center gap-2.5">
-              <Lock size={16} className="text-emerald-300" />
-              <h2 className="title-sm text-white">Hardening checklist</h2>
+              <Lock size={16} className="text-success" />
+              <h2 className="title-sm text-ink">Hardening checklist</h2>
             </div>
             <ul className="mt-4 grid gap-x-6 gap-y-2.5 sm:grid-cols-2">
               {CHECKLIST.map((c) => (
-                <li key={c} className="flex items-start gap-2 text-[13.5px] leading-relaxed text-slate-300">
-                  <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-emerald-300/80" />
+                <li key={c} className="flex items-start gap-2 font-secondary text-[13.5px] leading-relaxed text-ink-2">
+                  <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-success" />
                   <span className="tnum">{c}</span>
                 </li>
               ))}
@@ -72,20 +73,30 @@ export default function SecurityPage() {
         </Reveal>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <Reveal>
+          <Reveal className="h-full">
             <InfoCard icon={<FileKey2 size={18} />} title="Credential resolution order">
               Per-request headers (<code className="tnum">x-custom-api-key</code>) → user vault → environment
               fallback. The first resolvable credential wins; failed providers fall back deterministically through the
               registry chain.
             </InfoCard>
           </Reveal>
-          <Reveal delay={0.05}>
+          <Reveal delay={0.05} className="h-full">
             <InfoCard icon={<ServerCog size={18} />} title="Local model escape hatch">
               Point the Ollama provider at your own endpoint and run the entire language layer inside your network —
               useful when documents cannot leave premises at all.
             </InfoCard>
           </Reveal>
         </div>
+
+        <Reveal delay={0.1}>
+          <p className="body-sm mx-auto mt-8 max-w-xl rounded-xl border border-warning/30 bg-warning-soft/60 px-4 py-3.5 text-center text-ink-2">
+            Found a vulnerability? Report it to{" "}
+            <a href={`mailto:${SUPPORT_EMAIL}`} className="font-medium text-accent hover:underline">
+              {SUPPORT_EMAIL}
+            </a>{" "}
+            — responsible disclosure is always welcome.
+          </p>
+        </Reveal>
       </SectionShell>
       <CtaBand />
     </>

@@ -5,6 +5,7 @@ import type {
   ProviderDto,
   RunDetailDto,
   RunListItem,
+  UsageStatsDto,
   WorkflowDto,
 } from "./types";
 
@@ -62,6 +63,14 @@ export const api = {
     deleteKey: (provider: string) => request<{ ok: true }>(`/settings/keys?provider=${encodeURIComponent(provider)}`, { method: "DELETE" }),
     testKey: (payload: { provider: string; apiKey?: string; baseUrl?: string; model?: string }) =>
       request<{ ok: boolean; detail: string }>("/settings/test", { method: "POST", body: JSON.stringify(payload) }),
+  },
+  profile: {
+    update: (payload: { name?: string; currentPassword?: string; newPassword?: string; preferences?: Record<string, string | number | boolean | null> }) =>
+      request<{ user: { id: string; email: string; name: string } }>("/profile", { method: "PATCH", body: JSON.stringify(payload) }),
+    remove: (password: string) => request<{ ok: true }>("/profile", { method: "DELETE", body: JSON.stringify({ password }) }),
+  },
+  stats: {
+    get: () => request<UsageStatsDto>("/stats"),
   },
   workflows: {
     list: () => request<{ workflows: WorkflowDto[]; categories: string[] }>("/workflows"),

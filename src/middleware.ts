@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const PROTECTED = ["/workflows", "/runs", "/settings"];
+const PROTECTED = ["/dashboard", "/workflows", "/runs", "/settings", "/profile"];
 const AUTH_PAGES = ["/login", "/register"];
 
 export function middleware(request: NextRequest) {
@@ -15,7 +15,7 @@ export function middleware(request: NextRequest) {
   }
   if (AUTH_PAGES.includes(pathname) && hasSession) {
     const url = request.nextUrl.clone();
-    url.pathname = "/workflows";
+    url.pathname = "/dashboard";
     url.search = "";
     return NextResponse.redirect(url);
   }
@@ -23,5 +23,13 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/workflows/:path*", "/runs/:path*", "/settings/:path*", "/login", "/register"],
+  matcher: [
+    "/dashboard/:path*",
+    "/workflows/:path*",
+    "/runs/:path*",
+    "/settings/:path*",
+    "/profile/:path*",
+    "/login",
+    "/register",
+  ],
 };

@@ -5,6 +5,7 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { hashPassword, setSessionCookie, verifyPassword, clearSessionCookie, getCurrentUser } from "@/lib/auth/session";
 import { warnInsecureDefaults } from "@/lib/env";
+import { recordAudit } from "@/lib/audit";
 
 warnInsecureDefaults();
 
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
       .values({ email: email.toLowerCase(), name, passwordHash: hashPassword(password) })
       .returning({ id: users.id, email: users.email, name: users.name });
     await setSessionCookie(user.id);
+    await recordAudit(user.id, "account.created", user.email);
     return NextResponse.json({ user });
   }
 
@@ -54,10 +56,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
     await setSessionCookie(user.id);
+    await recordAudit(user.id, "auth.login", user.email);
     return NextResponse.json({ user: { id: user.id, email: user.email, name: user.name } });
   }
 
   if (action === "logout") {
+    const current = await getCurrentUser();
+    if (current) await recordAudit(current.id, "auth.logout", current.email);
     await clearSessionCookie();
     return NextResponse.json({ ok: true });
   }

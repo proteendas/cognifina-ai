@@ -185,6 +185,29 @@ export type ProviderDto = {
   docsUrl: string;
 };
 
+export type AuditEventDto = {
+  id: string;
+  action: string;
+  detail: string;
+  createdAt: string;
+};
+
+export type UsageStatsDto = {
+  totals: {
+    runs: number;
+    completed: number;
+    failed: number;
+    activeRuns: number;
+    documents: number;
+    findings: number;
+    avgRiskScore: number | null;
+  };
+  severityTotals: Record<Severity, number>;
+  keysConfigured: number;
+  recentRuns: RunListItem[];
+  events: AuditEventDto[];
+};
+
 export const STAGE_LABELS = [
   "Ingestion & Layout Parsing",
   "Deterministic Forensic Math",

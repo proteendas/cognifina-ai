@@ -5,6 +5,7 @@ import { and, eq, desc } from "drizzle-orm";
 import { requireUser, UnauthorizedError } from "@/lib/auth/session";
 import { getWorkflow } from "@/lib/workflows/definitions";
 import { sha256Hex } from "@/lib/auth/vault";
+import { recordAudit } from "@/lib/audit";
 
 export const maxDuration = 60;
 
@@ -93,6 +94,8 @@ export async function POST(request: Request) {
       });
     }
 
+    await recordAudit(user.id, "run.created", `${workflow.name}${entityName ? ` · ${entityName}` : ""} · ${files.length} file${files.length > 1 ? "s" : ""}`);
+
     return NextResponse.json({ runId: run.id }, { status: 201 });
   } catch (err) {
     if (err instanceof UnauthorizedError) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -107,7 +110,8 @@ export async function DELETE(request: Request) {
     const runId = new URL(request.url).searchParams.get("runId");
     if (!runId) return NextResponse.json({ error: "runId required" }, { status: 400 });
     await db.delete(chatMessages).where(eq(chatMessages.runId, runId));
-    await db.delete(runs).where(and(eq(runs.id, runId), eq(runs.userId, user.id)));
+    const deleted = await db.delete(runs).where(and(eq(runs.id, runId), eq(runs.userId, user.id))).returning({ name: runs.workflowName });
+    if (deleted.length > 0) await recordAudit(user.id, "run.deleted", deleted[0].name);
     return NextResponse.json({ ok: true });
   } catch (err) {
     if (err instanceof UnauthorizedError) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

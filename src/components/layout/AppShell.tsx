@@ -4,23 +4,44 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Binary, LayoutGrid, LogOut, Menu, PlayCircle, Settings, ShieldCheck, X } from "lucide-react";
+import {
+  LayoutDashboard,
+  LayoutGrid,
+  LogOut,
+  Mail,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
+  PlayCircle,
+  Settings,
+  ShieldCheck,
+  UserRound,
+  X,
+} from "lucide-react";
+import { LogoMark, Wordmark } from "@/components/layout/Logo";
+import { SUPPORT_EMAIL } from "@/components/marketing/MarketingChrome";
 import { api } from "@/lib/client";
 import { cn } from "@/lib/utils";
 
 const NAV = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/workflows", label: "Workflows", icon: LayoutGrid },
   { href: "/runs", label: "Runs", icon: PlayCircle },
+  { href: "/profile", label: "Profile", icon: UserRound },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
+
+type SessionUser = { name: string; email: string };
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState<SessionUser | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
+    setCollapsed(window.localStorage.getItem("cognifina-sidebar") === "collapsed");
     api.auth
       .me()
       .then((res) => setUser(res.user))
@@ -30,146 +51,216 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("cognifina:unauthorized", onUnauthorized);
   }, [router]);
 
+  // close the mobile drawer on navigation
+  useEffect(() => setMobileOpen(false), [pathname]);
+
+  const toggleCollapsed = () => {
+    setCollapsed((c) => {
+      window.localStorage.setItem("cognifina-sidebar", c ? "expanded" : "collapsed");
+      return !c;
+    });
+  };
+
   const logout = async () => {
     await api.auth.logout().catch(() => undefined);
     router.push("/");
   };
 
-  return (
-    <div className="flex min-h-dvh flex-col">
-      {/* ---------------- single-row floating toolbar ---------------- */}
-      <div className="pointer-events-none fixed inset-x-0 top-3 z-50 flex justify-center px-4">
-        <header className="material-thick pointer-events-auto flex h-[54px] w-full max-w-5xl items-center gap-1 rounded-full pl-5 pr-2">
-          <Link href="/workflows" className="pressable mr-auto flex items-center gap-2.5 rounded-full py-1.5 pr-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-cyan-400 text-white shadow-[0_0_24px_-4px_rgba(99,102,241,0.7)]">
-              <Binary size={15} strokeWidth={2.4} />
-            </span>
-            <span className="font-display text-[16px] font-bold tracking-[-0.02em] text-white">Cognifina</span>
-          </Link>
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
-          {/* desktop nav with animated active pill */}
-          <nav className="hidden items-center gap-0.5 md:flex" aria-label="Application">
-            {NAV.map((item) => {
-              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "relative rounded-full px-3.5 py-2 text-[13.5px] font-medium tracking-[-0.006em] transition-colors",
-                    active ? "text-white" : "text-slate-300 hover:text-white"
-                  )}
-                >
-                  {active && (
-                    <motion.span
-                      layoutId="app-active-pill"
-                      className="absolute inset-0 rounded-full bg-white/10 ring-1 ring-inset ring-white/10"
-                      transition={{ type: "spring", bounce: 0, duration: 0.38 }}
-                    />
-                  )}
-                  <span className="relative">{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
+  const initials = (user?.name ?? "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase())
+    .join("") || "·";
 
-          {/* user + actions */}
-          <div className="ml-1 flex items-center gap-1 md:ml-3">
-            {user && (
-              <div className="mr-1 hidden text-right leading-tight sm:block">
-                <p className="text-[12.5px] font-medium text-slate-200">{user.name}</p>
-                <p className="max-w-[180px] truncate text-[10.5px] text-slate-500">{user.email}</p>
-              </div>
+  /* ------------------------- shared nav renderer ------------------------- */
+  const NavLinks = ({ compact, onNavigate }: { compact?: boolean; onNavigate?: () => void }) => (
+    <nav aria-label="Application" className="flex flex-col gap-0.5 px-2">
+      {NAV.map((item) => {
+        const active = isActive(item.href);
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onNavigate}
+            title={compact ? item.label : undefined}
+            className={cn(
+              "pressable flex items-center gap-3 rounded-lg text-sm font-medium transition-colors",
+              compact ? "h-10 justify-center px-0" : "px-3 py-2.5",
+              active ? "bg-accent-soft text-accent" : "text-ink-3 hover:bg-paper-2 hover:text-ink"
             )}
-            <button
-              onClick={() => void logout()}
-              aria-label="Sign out"
-              title="Sign out"
-              className="pressable hidden h-9 w-9 items-center justify-center rounded-full text-slate-300 hover:bg-white/8 hover:text-white sm:flex"
-            >
-              <LogOut size={15} />
-            </button>
-            <button
-              onClick={() => setMenuOpen(true)}
-              aria-label="Open menu"
-              className="pressable flex h-9 w-9 items-center justify-center rounded-full text-slate-200 hover:bg-white/8 md:hidden"
-            >
-              <Menu size={18} />
-            </button>
-          </div>
-        </header>
-      </div>
+          >
+            <item.icon size={17} className="shrink-0" />
+            {!compact && <span className="truncate">{item.label}</span>}
+          </Link>
+        );
+      })}
+    </nav>
+  );
 
-      {/* clearance under floating toolbar */}
-      <div className="h-[76px]" aria-hidden />
-
-      {/* trust strip */}
-      <div className="mx-auto w-full max-w-5xl px-4">
-        <div className="flex items-center gap-2 rounded-xl bg-emerald-400/8 px-3.5 py-2 ring-1 ring-inset ring-emerald-400/20">
-          <ShieldCheck size={14} className="shrink-0 text-emerald-300" />
-          <p className="text-[11.5px] leading-tight text-emerald-100/85">
-            Math before Models — deterministic engines produce every number; language models only assist.
-          </p>
+  return (
+    <div className="flex min-h-dvh">
+      {/* ------------------------- desktop sidebar ------------------------- */}
+      <aside
+        className={cn(
+          "sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-line bg-surface transition-[width] duration-200 ease-out md:flex",
+          collapsed ? "w-[68px]" : "w-60"
+        )}
+      >
+        {/* brand + collapse toggle */}
+        <div className={cn("flex h-16 items-center gap-2.5 border-b border-line", collapsed ? "justify-center px-2" : "pl-4 pr-2")}>
+          <Link href="/dashboard" className="flex items-center gap-2.5 overflow-hidden">
+            <LogoMark />
+            {!collapsed && <Wordmark />}
+          </Link>
+          {!collapsed && (
+            <button
+              onClick={toggleCollapsed}
+              aria-label="Collapse menu"
+              className="pressable ml-auto flex h-8 w-8 items-center justify-center rounded-lg text-ink-4 hover:bg-paper-2 hover:text-ink"
+            >
+              <PanelLeftClose size={16} />
+            </button>
+          )}
         </div>
+        {collapsed && (
+          <button
+            onClick={toggleCollapsed}
+            aria-label="Expand menu"
+            className="pressable mx-auto mt-3 flex h-9 w-9 items-center justify-center rounded-lg text-ink-4 hover:bg-paper-2 hover:text-ink"
+          >
+            <PanelLeftOpen size={17} />
+          </button>
+        )}
+
+        <div className={cn("min-h-0 flex-1 overflow-y-auto", collapsed ? "pt-3" : "pt-4")}>
+          <NavLinks compact={collapsed} />
+        </div>
+
+        {/* account block */}
+        <div className={cn("border-t border-line", collapsed ? "px-2 py-3" : "p-3")}>
+          {collapsed ? (
+            <div className="flex flex-col items-center gap-1.5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-paper-2 text-[11px] font-semibold text-ink-2">
+                {initials}
+              </span>
+              <button
+                onClick={() => void logout()}
+                aria-label="Sign out"
+                title="Sign out"
+                className="pressable flex h-9 w-9 items-center justify-center rounded-lg text-ink-4 hover:bg-danger-soft hover:text-danger"
+              >
+                <LogOut size={15} />
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center gap-2.5 rounded-lg px-1 py-1.5">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line bg-paper-2 text-[11px] font-semibold text-ink-2">
+                  {initials}
+                </span>
+                <div className="min-w-0 leading-tight">
+                  <p className="truncate text-[13px] font-medium text-ink">{user?.name ?? "Account"}</p>
+                  <p className="truncate text-[11px] text-ink-4">{user?.email ?? "\u00A0"}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => void logout()}
+                className="pressable mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-ink-3 hover:bg-danger-soft hover:text-danger"
+              >
+                <LogOut size={15} /> Sign out
+              </button>
+            </>
+          )}
+        </div>
+      </aside>
+
+      {/* ------------------------- main column ------------------------- */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* mobile topbar */}
+        <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-line bg-paper/90 px-4 backdrop-blur-md md:hidden">
+          <button
+            onClick={() => setMobileOpen(true)}
+            aria-label="Open menu"
+            className="pressable -ml-1.5 flex h-9 w-9 items-center justify-center rounded-lg text-ink-2 hover:bg-surface-2"
+          >
+            <Menu size={19} />
+          </button>
+          <Link href="/dashboard" className="flex items-center gap-2.5">
+            <LogoMark />
+            <Wordmark />
+          </Link>
+        </header>
+
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+
+        <footer className="border-t border-line">
+          <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-3.5 text-[11px] text-ink-4 sm:px-6">
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck size={12} className="text-success" />
+              Math before Models — deterministic engines produce every number.
+            </span>
+            <a href={`mailto:${SUPPORT_EMAIL}`} className="tnum inline-flex items-center gap-1 hover:text-accent">
+              <Mail size={11} /> {SUPPORT_EMAIL}
+            </a>
+          </div>
+        </footer>
       </div>
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:px-6">{children}</main>
-
-      {/* mobile sheet */}
+      {/* ------------------------- mobile drawer ------------------------- */}
       <AnimatePresence>
-        {menuOpen && (
+        {mobileOpen && (
           <div className="fixed inset-0 z-[60] md:hidden">
             <motion.div
-              className="absolute inset-0 bg-black/60"
+              className="absolute inset-0 bg-[#1a1d1f]/40"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.22 }}
-              onClick={() => setMenuOpen(false)}
+              onClick={() => setMobileOpen(false)}
             />
             <motion.div
-              className="material-thick absolute inset-x-3 top-3 overflow-hidden rounded-3xl p-5"
-              initial={{ y: "-108%", opacity: 0.7 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: "-108%", opacity: 0.7 }}
+              className="absolute inset-y-0 left-0 flex w-[280px] flex-col border-r border-line bg-surface shadow-pop"
+              initial={{ x: "-104%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-104%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.42 }}
             >
-              <div className="mb-4 flex items-center justify-between">
-                <div className="min-w-0">
-                  <p className="truncate text-[15px] font-semibold text-white">{user?.name ?? "Account"}</p>
-                  <p className="truncate text-[12px] text-slate-500">{user?.email}</p>
+              <div className="flex h-14 items-center justify-between border-b border-line pl-4 pr-2">
+                <div className="flex items-center gap-2.5">
+                  <LogoMark />
+                  <Wordmark />
                 </div>
                 <button
-                  onClick={() => setMenuOpen(false)}
+                  onClick={() => setMobileOpen(false)}
                   aria-label="Close menu"
-                  className="pressable flex h-9 w-9 items-center justify-center rounded-full text-slate-300 hover:bg-white/8"
+                  className="pressable flex h-9 w-9 items-center justify-center rounded-lg text-ink-3 hover:bg-paper-2"
                 >
                   <X size={17} />
                 </button>
               </div>
-              <div className="space-y-1">
-                {NAV.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMenuOpen(false)}
-                    className={cn(
-                      "pressable flex items-center gap-3 rounded-xl px-4 py-3 text-[16px] font-medium",
-                      pathname.startsWith(item.href) ? "bg-white/10 text-white" : "text-slate-200 hover:bg-white/6"
-                    )}
-                  >
-                    <item.icon size={17} />
-                    {item.label}
-                  </Link>
-                ))}
-                <Link href="/" onClick={() => setMenuOpen(false)} className="pressable flex items-center gap-3 rounded-xl px-4 py-3 text-[16px] font-medium text-slate-200 hover:bg-white/6">
-                  <Binary size={17} /> Marketing site
-                </Link>
+              <div className="min-h-0 flex-1 overflow-y-auto pt-3 pb-4">
+                <NavLinks onNavigate={() => setMobileOpen(false)} />
+                <div className="mt-4 border-t border-line px-2 pt-3">
+                  <div className="flex items-center gap-2.5 px-1.5 py-1.5">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line bg-paper-2 text-[11px] font-semibold text-ink-2">
+                      {initials}
+                    </span>
+                    <div className="min-w-0 leading-tight">
+                      <p className="truncate text-[13px] font-medium text-ink">{user?.name ?? "Account"}</p>
+                      <p className="truncate text-[11px] text-ink-4">{user?.email}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="border-t border-line p-3">
                 <button
                   onClick={() => void logout()}
-                  className="pressable flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-[16px] font-medium text-rose-300 hover:bg-rose-500/10"
+                  className="pressable flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-danger hover:bg-danger-soft"
                 >
-                  <LogOut size={17} /> Sign out
+                  <LogOut size={16} /> Sign out
                 </button>
               </div>
             </motion.div>

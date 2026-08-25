@@ -7,6 +7,7 @@ import { requireUser, UnauthorizedError } from "@/lib/auth/session";
 import { encryptSecret, keyHint } from "@/lib/auth/vault";
 import { PROVIDER_LIST, PROVIDERS, type ProviderId } from "@/lib/ai/registry";
 import { upsertKey, deleteKey } from "@/lib/ai/keys";
+import { recordAudit } from "@/lib/audit";
 
 const saveSchema = z.object({
   provider: z.string().refine((p) => p in PROVIDERS),
@@ -51,6 +52,7 @@ export async function PUT(request: Request) {
       defaultModel: defaultModel ?? null,
       status: "saved",
     });
+    await recordAudit(user.id, "key.saved", provider);
     return NextResponse.json({ ok: true });
   } catch (err) {
     if (err instanceof UnauthorizedError) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -64,6 +66,7 @@ export async function DELETE(request: Request) {
     const provider = new URL(request.url).searchParams.get("provider");
     if (!provider || !(provider in PROVIDERS)) return NextResponse.json({ error: "Invalid provider" }, { status: 400 });
     await deleteKey(user.id, provider as ProviderId);
+    await recordAudit(user.id, "key.removed", provider);
     return NextResponse.json({ ok: true });
   } catch (err) {
     if (err instanceof UnauthorizedError) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

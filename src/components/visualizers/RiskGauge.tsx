@@ -3,12 +3,12 @@
 import { motion, useReducedMotion } from "framer-motion";
 import type { RiskBand } from "@/lib/types";
 
-const BAND_COLORS: Record<RiskBand | "none", [string, string]> = {
-  Low: ["#34d399", "#22d3ee"],
-  Moderate: ["#facc15", "#fb923c"],
-  Elevated: ["#fb923c", "#f43f5e"],
-  Severe: ["#f43f5e", "#e11d48"],
-  none: ["#475569", "#64748b"],
+const BAND_COLORS: Record<RiskBand | "none", string> = {
+  Low: "#1E874B",
+  Moderate: "#C98A1E",
+  Elevated: "#CE6A23",
+  Severe: "#D64545",
+  none: "#8B9096",
 };
 
 export function RiskGauge({
@@ -23,50 +23,47 @@ export function RiskGauge({
   const reduce = useReducedMotion();
   const max = 100;
   const pct = score == null ? 0 : Math.min(max, Math.max(0, score)) / max;
-  const radius = 80;
-  const circumference = Math.PI * radius; // semicircle
-  const [c1, c2] = BAND_COLORS[band ?? "none"];
+
+  const stroke = Math.max(8, Math.round(size * 0.075));
+  const r = (120 - stroke) / 2 - 2;
+  const circumference = 2 * Math.PI * r;
+  const color = BAND_COLORS[band ?? "none"];
 
   return (
-    <div className="relative inline-flex flex-col items-center" style={{ width: size }}>
-      <svg width={size} height={size * 0.62} viewBox="0 0 200 124" className="overflow-visible">
-        <defs>
-          <linearGradient id={`gauge-grad-${band ?? "none"}`} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={c1} />
-            <stop offset="100%" stopColor={c2} />
-          </linearGradient>
-        </defs>
-        <path
-          d={`M ${100 - radius} 110 A ${radius} ${radius} 0 0 1 ${100 + radius} 110`}
-          fill="none"
-          stroke="rgba(255,255,255,0.08)"
-          strokeWidth={13}
-          strokeLinecap="round"
-        />
-        <motion.path
-          d={`M ${100 - radius} 110 A ${radius} ${radius} 0 0 1 ${100 + radius} 110`}
-          fill="none"
-          stroke={`url(#gauge-grad-${band ?? "none"})`}
-          strokeWidth={13}
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          initial={reduce ? false : { strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: circumference * (1 - pct) }}
-          transition={{ type: "spring", bounce: 0, duration: 0.9, delay: 0.15 }}
-        />
-      </svg>
-      <div className="-mt-[calc(38%+8px)] flex flex-col items-center">
-        <span className="tnum text-[44px] font-bold leading-none text-white">{score ?? "—"}</span>
-        <span className="mt-1 text-[11px] uppercase tracking-[0.18em] text-slate-400">/ 100 risk</span>
-        {band && (
-          <span
-            className="mt-2 rounded-full px-3 py-1 text-[12px] font-semibold tracking-wide"
-            style={{ background: `${c1}1f`, color: c1 }}
-          >
-            {band}
+    <div className="inline-flex shrink-0 flex-col items-center" style={{ width: size }}>
+      {/* donut ring — number is absolutely centred, so alignment holds at every size */}
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg width={size} height={size} viewBox="0 0 120 120" className="-rotate-90">
+          <circle cx="60" cy="60" r={r} fill="none" stroke="var(--line)" strokeWidth={stroke} />
+          <motion.circle
+            cx="60"
+            cy="60"
+            r={r}
+            fill="none"
+            stroke={color}
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            initial={reduce ? false : { strokeDashoffset: circumference }}
+            animate={{ strokeDashoffset: circumference * (1 - pct) }}
+            transition={{ type: "spring", bounce: 0, duration: 0.9, delay: 0.15 }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="tnum font-bold leading-none tracking-tight text-ink" style={{ fontSize: Math.round(size * 0.24) }}>
+            {score ?? "—"}
           </span>
-        )}
+          <span className="mt-1.5 text-[10px] font-medium uppercase tracking-[0.12em] text-ink-4">/ 100 risk</span>
+        </div>
       </div>
+      {band && (
+        <span
+          className="mt-3 rounded-full border px-3 py-1 text-[12px] font-semibold tracking-wide"
+          style={{ background: `${color}14`, borderColor: `${color}33`, color }}
+        >
+          {band}
+        </span>
+      )}
     </div>
   );
 }

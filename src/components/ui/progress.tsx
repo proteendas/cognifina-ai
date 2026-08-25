@@ -9,10 +9,10 @@ export function Progress({ value, className }: { value: number; className?: stri
       aria-valuenow={Math.round(value)}
       aria-valuemin={0}
       aria-valuemax={100}
-      className={cn("h-1.5 w-full overflow-hidden rounded-full bg-white/8", className)}
+      className={cn("h-1.5 w-full overflow-hidden rounded-full bg-line", className)}
     >
       <div
-        className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-violet-400 to-cyan-400 transition-[width] duration-500 ease-out"
+        className="h-full rounded-full bg-accent transition-[width] duration-700 ease-out"
         style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
       />
     </div>

@@ -58,39 +58,51 @@ export default function EnginesPage() {
         sub="Each engine is a pure-TypeScript implementation of its source definition — no heavyweight runtimes, no probabilistic shortcuts, identical outputs on every machine."
       />
 
-      <SectionShell className="!pt-10">
+      <SectionShell className="!pt-8">
         <Reveal>
-          <div className="material-thick overflow-hidden rounded-[24px] p-6 sm:p-8">
+          <div className="overflow-hidden rounded-2xl border border-line bg-surface p-6 shadow-pop sm:p-8">
             <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2">
-              <h2 className="display-md text-white">Observed vs. Benford-expected frequency</h2>
-              <p className="tnum text-[12px] text-slate-400">illustrative sample · digit 3 carries excess weight</p>
+              <h2 className="display-md text-ink">Observed vs. Benford-expected frequency</h2>
+              <p className="tnum font-secondary text-[12px] text-ink-4">illustrative sample · digit 3 carries excess weight</p>
             </div>
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={DEMO} margin={{ top: 4, right: 4, left: -14, bottom: 0 }} barGap={3}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-                  <XAxis dataKey="digit" tick={{ fill: "#8394b8", fontSize: 12 }} axisLine={false} tickLine={false} />
-                  <YAxis unit="%" width={52} tick={{ fill: "#8394b8", fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" vertical={false} />
+                  <XAxis dataKey="digit" tick={{ fill: "#6f767e", fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis unit="%" width={52} tick={{ fill: "#6f767e", fontSize: 12 }} axisLine={false} tickLine={false} />
                   <Tooltip
-                    cursor={{ fill: "rgba(255,255,255,0.04)" }}
-                    contentStyle={{ background: "rgba(13,16,28,0.96)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, fontSize: 13 }}
+                    cursor={{ fill: "rgba(15,61,62,0.05)" }}
+                    contentStyle={{
+                      background: "rgba(255,255,255,0.98)",
+                      border: "1px solid var(--line)",
+                      borderRadius: 12,
+                      fontSize: 13,
+                      color: "#1a1d1f",
+                      boxShadow: "0 12px 32px -8px rgba(26,29,31,0.18)",
+                    }}
                     formatter={(v: number, n: string) => [`${v}%`, n === "observed" ? "Observed" : "Benford expected"]}
                   />
-                  <Legend wrapperStyle={{ fontSize: 12, color: "#8394b8" }} />
-                  <Bar dataKey="expected" fill="#334155" radius={[5, 5, 0, 0]} maxBarSize={30} />
-                  <Bar dataKey="observed" fill="#6366f1" radius={[5, 5, 0, 0]} maxBarSize={30} />
+                  <Legend wrapperStyle={{ fontSize: 12, color: "#6f767e" }} />
+                  <Bar dataKey="expected" fill="#DAD7D1" radius={[5, 5, 0, 0]} maxBarSize={30} />
+                  <Bar dataKey="observed" fill="#0F3D3E" radius={[5, 5, 0, 0]} maxBarSize={30} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap items-center gap-2">
               {[["1", "-1.8σ", false], ["3", "+3.1σ", true], ["4", "-2.2σ", false]].map(([d, z, bad]) => (
-                <span key={d as string} className={`tnum flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] ${bad ? "border-rose-500/40 bg-rose-500/12 text-rose-300" : "border-white/8 bg-white/4 text-slate-400"}`}>
+                <span
+                  key={d as string}
+                  className={`tnum flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] ${
+                    bad ? "border-danger/30 bg-danger-soft text-danger" : "border-line bg-surface-2 text-ink-3"
+                  }`}
+                >
                   digit {d} · {z}
                 </span>
               ))}
-              <span className="flex items-center gap-3 pl-2 text-[11px] text-slate-500">
-                <span className="flex items-center gap-1"><AlertTriangle size={11} className="text-rose-300" /> excess</span>
-                <span className="flex items-center gap-1"><CheckCircle2 size={11} className="text-emerald-300" /> conforming</span>
+              <span className="flex items-center gap-3 pl-2 font-secondary text-[11px] text-ink-4">
+                <span className="flex items-center gap-1"><AlertTriangle size={11} className="text-danger" /> excess</span>
+                <span className="flex items-center gap-1"><CheckCircle2 size={11} className="text-success" /> conforming</span>
                 <Minus size={0} />
               </span>
             </div>
@@ -99,8 +111,12 @@ export default function EnginesPage() {
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {ENGINES.map((e, i) => (
-            <Reveal key={e.name} delay={i * 0.05}>
-              <InfoCard icon={<span className="font-display text-[15px] font-bold">0{i + 1}</span>} title={e.name} chip={e.chip}>
+            <Reveal key={e.name} delay={i * 0.05} className="h-full">
+              <InfoCard
+                icon={<span className="font-mono text-[13px] font-medium">0{i + 1}</span>}
+                title={e.name}
+                chip={e.chip}
+              >
                 {e.body}
               </InfoCard>
             </Reveal>

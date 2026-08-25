@@ -40,10 +40,28 @@ export const users = pgTable(
     email: text("email").notNull(),
     name: text("name").notNull(),
     passwordHash: text("password_hash").notNull(),
+    preferences: jsonb("preferences").$type<Record<string, unknown>>().notNull().default({}),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
     emailIdx: uniqueIndex("users_email_idx").on(t.email),
+  })
+);
+
+/** Append-only account activity trail rendered on the dashboard & profile pages. */
+export const auditEvents = pgTable(
+  "audit_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    action: text("action").notNull(), // account.created | auth.login | run.created | key.saved …
+    detail: text("detail").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    userEventsIdx: index("audit_events_user_created_idx").on(t.userId, t.createdAt),
   })
 );
 

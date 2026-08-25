@@ -21,7 +21,7 @@ export function Reveal({
   return (
     <motion.div
       className={className}
-      initial={reduce ? false : { opacity: 0, y: 18 }}
+      initial={reduce ? false : { opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-70px" }}
       transition={{ ...spring, delay }}
@@ -41,10 +41,10 @@ export function PageHero({
   sub: string;
 }) {
   return (
-    <header className="mx-auto w-full max-w-6xl px-5 pt-6 sm:pt-10">
+    <header className="mx-auto w-full max-w-6xl px-4 pb-2 pt-12 sm:px-6 sm:pt-16">
       <Reveal>
         <p className="eyebrow">{eyebrow}</p>
-        <h1 className="display-lg mt-3 max-w-3xl text-balance text-white">{title}</h1>
+        <h1 className="display-lg mt-3 max-w-3xl text-balance text-ink">{title}</h1>
         <p className="lede mt-4 max-w-2xl text-balance">{sub}</p>
       </Reveal>
     </header>
@@ -59,7 +59,7 @@ export function SectionShell({
   className?: string;
 }) {
   return (
-    <section className={`mx-auto w-full max-w-6xl px-5 py-16 sm:py-20 ${className ?? ""}`}>
+    <section className={`mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-16 ${className ?? ""}`}>
       {children}
     </section>
   );
@@ -68,23 +68,27 @@ export function SectionShell({
 export function CtaBand() {
   const reduce = useReducedMotion();
   return (
-    <section className="mx-auto w-full max-w-6xl px-5 pb-24 pt-4">
+    <section className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4 sm:px-6">
       <Reveal className="relative">
-        <div className="material-thick relative overflow-hidden rounded-[28px] px-8 py-14 text-center">
-          <div className="pointer-events-none absolute -top-24 left-1/2 h-48 w-[520px] -translate-x-1/2 rounded-full bg-indigo-500/25 blur-3xl" />
-          <h2 className="display-md relative mx-auto max-w-lg text-balance text-white sm:text-[28px]">
-            Same evidence. Same verdict. Every time.
-          </h2>
-          <p className="body-sm relative mx-auto mt-2.5 max-w-md">
-            Create a workspace, connect any provider key, and get a citation-bound forensic report.
-          </p>
-          <div className="relative mt-7 flex justify-center">
-            <Link href="/register">
-              <Button size="lg" className="group rounded-full px-7">
-                Get started
-                <ArrowRight size={16} className="transition-transform duration-150 group-hover:translate-x-0.5" />
-              </Button>
-            </Link>
+        <div className="pointer-events-none absolute -inset-4 rounded-3xl bg-accent/5 blur-2xl" aria-hidden />
+        <div className="relative overflow-hidden rounded-2xl border border-line bg-surface px-6 py-14 text-center shadow-pop">
+          <div className="dot-grid pointer-events-none absolute inset-0 opacity-60" aria-hidden />
+          <div className="relative">
+            <p className="eyebrow">Get started</p>
+            <h2 className="display-md mx-auto mt-2 max-w-lg text-balance text-ink">
+              Same evidence. Same verdict. Every time.
+            </h2>
+            <p className="body-sm mx-auto mt-3 max-w-md">
+              Create a workspace, connect any provider key, and get a citation-bound forensic report.
+            </p>
+            <div className="mt-7 flex justify-center">
+              <Link href="/register">
+                <Button size="lg" className="group px-7">
+                  Get started
+                  <ArrowRight size={16} className="transition-transform duration-150 group-hover:translate-x-0.5" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </Reveal>
@@ -105,15 +109,19 @@ export function InfoCard({
   chip?: string;
 }) {
   return (
-    <div className="material group rounded-[20px] p-6 transition-colors duration-200 hover:border-indigo-400/30">
-      <div className="flex items-start justify-between">
-        <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-[13px] bg-indigo-500/12 text-indigo-300 transition-colors group-hover:bg-indigo-500/20">
+    <div className="group h-full rounded-xl border border-line bg-surface p-5 shadow-soft transition-shadow duration-200 hover:shadow-lift">
+      <div className="flex items-start justify-between gap-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-line bg-surface-2 text-accent transition-colors group-hover:border-accent/30 group-hover:bg-accent-soft">
           {icon}
         </span>
-        {chip && <code className="tnum rounded-lg bg-white/6 px-2 py-1 text-[11px] text-cyan-300">{chip}</code>}
+        {chip && (
+          <code className="tnum shrink-0 rounded-md border border-line bg-paper-2 px-2 py-1 text-[10.5px] text-ink-3">
+            {chip}
+          </code>
+        )}
       </div>
-      <h3 className="title-sm text-white">{title}</h3>
-      <div className="body-sm mt-1.5">{children}</div>
+      <h3 className="title-sm mb-1.5 mt-4 text-ink">{title}</h3>
+      <div className="body-sm">{children}</div>
     </div>
   );
 }

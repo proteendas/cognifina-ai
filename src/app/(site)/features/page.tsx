@@ -63,10 +63,10 @@ export default function FeaturesPage() {
         title={<>Everything you need to defend a conclusion.</>}
         sub="Cognifina is not a chatbot bolted onto documents. It is a structured forensic pipeline that treats language models as optional assistants — and mathematics as the source of truth."
       />
-      <SectionShell className="!pt-10">
+      <SectionShell className="!pt-8">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f, i) => (
-            <Reveal key={f.title} delay={i * 0.04}>
+            <Reveal key={f.title} delay={i * 0.04} className="h-full">
               <InfoCard icon={<f.icon size={18} />} title={f.title} chip={f.chip}>
                 {f.body}
               </InfoCard>
@@ -75,7 +75,7 @@ export default function FeaturesPage() {
         </div>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {EXTRAS.map((f, i) => (
-            <Reveal key={f.title} delay={0.08 + i * 0.04}>
+            <Reveal key={f.title} delay={0.08 + i * 0.04} className="h-full">
               <InfoCard icon={<f.icon size={18} />} title={f.title}>
                 {f.body}
               </InfoCard>
