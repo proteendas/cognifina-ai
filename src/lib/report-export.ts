@@ -85,7 +85,7 @@ export function buildReportMarkdown(data: RunDetailDto): string {
 
   lines.push("---");
   lines.push("");
-  lines.push("*Compiled by Cognifina — deterministic forensic & compliance AI. Math before Models.*");
+  lines.push("*Compiled by Cognifina — deterministic forensic & compliance AI. Statistics lead. Models follow.*");
   return lines.join("\n");
 }
 

@@ -1,6 +1,6 @@
 # Cognifina AI — Architecture
 
-> Deterministic forensic & compliance meta-harness. "Math before Models": hard statistics always precede probabilistic inference, and every artifact is reproducible.
+> Deterministic forensic & compliance meta-harness. "Statistics lead. Models follow.": hard statistics always precede probabilistic inference, and every artifact is reproducible.
 
 ---
 

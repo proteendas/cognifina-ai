@@ -1,6 +1,6 @@
 # Cognifina AI
 
-**Deterministic forensic & compliance AI meta-harness** — *"Math before Models."*
+**Deterministic forensic & compliance AI meta-harness** — *"Statistics lead. Models follow."*
 
 Cognifina runs **25 finance & compliance workflows** (due diligence, statutory audit prep, KYC/AML screening, tax & regulatory checks) through a **6-agent deterministic pipeline** over your uploaded documents. Every number is produced by pure statistical engines (Benford's Law, Beneish M-Score, Altman Z′-Score, seeded Isolation Forest, ratio volatility) *before* any language model is consulted — and every finding is bound to an exact **page-level citation** (document · page · excerpt · bounding box).
 

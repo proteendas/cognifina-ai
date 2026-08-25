@@ -203,7 +203,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-3.5 text-[11px] text-ink-4 sm:px-6">
             <span className="flex items-center gap-1.5">
               <ShieldCheck size={12} className="text-success" />
-              Math before Models — deterministic engines produce every number.
+              Statistics lead. Models follow — deterministic engines produce every number.
             </span>
             <a href={`mailto:${SUPPORT_EMAIL}`} className="tnum inline-flex items-center gap-1 hover:text-accent">
               <Mail size={11} /> {SUPPORT_EMAIL}

@@ -59,7 +59,7 @@ export default function HomePage() {
             transition={{ ...spring, delay: 0.05 }}
             className="display-hero mt-5 max-w-4xl text-balance text-ink"
           >
-            Forensic AI that puts <span className="text-accent">math before models</span>.
+            Statistics lead. Models follow.
           </motion.h1>
 
           <motion.p
@@ -124,15 +124,15 @@ export default function HomePage() {
           <Reveal>
             <p className="eyebrow text-center">How it works</p>
             <h2 className="display-md mt-2 text-center text-balance text-ink">
-              You pick the report. The harness compiles the run.
+              You set the scope. The pipeline handles the rest.
             </h2>
           </Reveal>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              [Workflow, "Choose a workflow", "Declare the report you need — due diligence, statutory audit review, KYC/AML. The plan is fixed before any document is read."],
-              [FileUp, "Upload the evidence", "Drop statements, ledgers and filings. Every page of every file is parsed — no sampling."],
-              [Cpu, "The run executes", "Six specialist agents extract, test and verify in a fixed order — deterministic math before any model is consulted."],
-              [FileCheck2, "Read a defensible report", "Ranked findings, a weighted risk score and a citation on every claim — down to the page and bounding box."],
+              [Workflow, "Pick your workflow", "Select the review you need — due diligence, statutory audit prep, KYC/AML. The execution plan is fixed before any document is read."],
+              [FileUp, "Bring your documents", "Drop statements, ledgers and filings. Full-document coverage with per-line coordinates — nothing is sampled."],
+              [Cpu, "The engines take over", "Six agents work through the evidence in a fixed order — extraction, math, entities, reconciliation, gaps, report — each finishing before the next begins."],
+              [FileCheck2, "Read your report", "Ranked findings, a weighted risk score, and a page-level citation behind each claim — ready for review or dispute."],
             ].map(([Icon, title, body], i) => (
               <Reveal key={title as string} delay={i * 0.05} className="h-full">
                 <div className="flex h-full flex-col rounded-xl border border-line bg-surface p-5 shadow-soft transition-shadow hover:shadow-lift">
@@ -165,17 +165,17 @@ export default function HomePage() {
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
             <Reveal>
               <p className="eyebrow">The problem</p>
-              <h2 className="display-md mt-2 text-balance text-ink">The file grows. The deadline doesn&apos;t.</h2>
+              <h2 className="display-md mt-2 text-balance text-ink">Scope grows. Deadlines don&apos;t move.</h2>
               <p className="lede mt-3 max-w-md">
-                Serious financial review is still a weeks-long, human-hours business — and the failure mode is silent: things get missed.
+                Financial review is still a weeks-long, human-hours exercise — and its failure mode is quiet: the things nobody had time to check.
               </p>
             </Reveal>
             <div className="space-y-5">
               {[
-                ["How long does a serious review take?", "Three to six weeks of analyst time per target — and the queue rarely stays at one target."],
-                ["What does expertise cost?", "Forensic accountants bill $500–$1,500 an hour, and much of that time is mechanical cross-checking."],
-                ["What actually gets missed?", "Cross-document patterns: a number that disagrees between versions, a receivable that inflates overnight, a round-sum journal posted on a Sunday."],
-                ["What about multi-entity work?", "Each extra entity multiplies the checklist — ownership chains, registry filings, related-party webs."],
+                ["How long does a proper review take?", "Weeks of senior analyst time for a single target — and the queue rarely holds just one."],
+                ["What does that expertise cost?", "Specialist reviewers bill hundreds of dollars an hour, and much of it goes to mechanical cross-checking."],
+                ["Where do reviews fail?", "The cross-document stuff: figures that disagree between versions, receivables that balloon overnight, round-sum entries posted on weekends."],
+                ["And multi-entity groups?", "Every added entity multiplies the checklist — ownership chains, registry filings, webs of related parties."],
               ].map(([q, a], i) => (
                 <Reveal key={q} delay={i * 0.04}>
                   <div className="rounded-xl border border-line bg-surface p-5 shadow-soft">
@@ -223,10 +223,10 @@ export default function HomePage() {
           </Reveal>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              [RefreshCcw, "Reproducible by design", "Same evidence, same scope → identical score, findings and ledger. Bit-for-bit, every rerun."],
-              [Binary, "Math before models", "Benford, Beneish, Altman and seeded forests compute first. Models only assist — never originate a number."],
-              [Quote, "Cited to the page", "Every claim carries document · page · excerpt · bounding box. The citation drawer re-renders the proof."],
-              [Scale, "Honest about gaps", "Missing evidence, scanned pages and sequence breaks are reported as findings — never silently skipped."],
+              [RefreshCcw, "Reproducible, provably", "Re-run any analysis and the score, findings and ledger come out identical. Bit-for-bit, every time."],
+              [Binary, "Statistics first, models second", "Benford, Beneish, Altman and seeded forests compute the numbers. Models only assist — never originate one."],
+              [Quote, "Cited to the page", "Each claim carries document · page · excerpt · bounding box. The citation drawer re-renders the proof."],
+              [Scale, "Gaps are findings too", "Missing statements, scanned pages and sequence breaks get reported explicitly — never quietly skipped."],
             ].map(([Icon, t, b], i) => (
               <Reveal key={t as string} delay={i * 0.05} className="h-full">
                 <div className="h-full rounded-xl border border-line bg-surface p-6 shadow-soft transition-shadow hover:shadow-lift">

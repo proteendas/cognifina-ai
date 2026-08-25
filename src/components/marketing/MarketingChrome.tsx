@@ -182,7 +182,7 @@ export function MarketingFooter() {
       <div className="border-t border-line">
         <div className="tnum mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-[11px] text-ink-4 sm:px-6">
           <span>© {new Date().getFullYear()} Cognifina</span>
-          <span>Math before Models.</span>
+          <span>Statistics lead. Models follow.</span>
         </div>
       </div>
     </footer>

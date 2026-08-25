@@ -9,7 +9,7 @@ const AGENTS = [
     icon: FileSearch,
     label: "Ingestion & Layout Parsing",
     deliverable: "coordinate-tagged blocks · normalized tables",
-    body: "Reads every page of every file — no sampling. PDFs yield per-line bounding boxes via a serverless-safe pdf.js build; spreadsheets arrive as clean matrices; scanned pages are detected and reported rather than skipped.",
+    body: "Parses the full corpus end-to-end — nothing is sampled. PDFs yield per-line bounding boxes via a serverless-safe pdf.js build; spreadsheets arrive as clean matrices; scanned pages are detected and reported rather than skipped.",
   },
   {
     icon: Sigma,

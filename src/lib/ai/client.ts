@@ -4,7 +4,7 @@ import { PROVIDERS, type ProviderId } from "./registry";
 
 /**
  * Unified BYOK model client.
- * - temperature = 0.0 everywhere ("Math before Models": LLM never invents numbers)
+ * - temperature = 0.0 everywhere ("Statistics lead. Models follow.": LLM never invents numbers)
  * - structured JSON output validated with Zod; one deterministic repair retry
  * - keys resolved per-request: headers > user vault > env
  */

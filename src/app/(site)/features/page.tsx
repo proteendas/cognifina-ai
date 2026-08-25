@@ -8,7 +8,7 @@ const FEATURES = [
     icon: RefreshCcw,
     title: "Deterministic execution",
     chip: "idempotent",
-    body: "Re-running the same evidence produces the exact same execution plan, deterministic metrics and structured ledger. No sampling. No drift. No “different answer each time”.",
+    body: "Re-running the same evidence produces the exact same execution plan, deterministic metrics and structured ledger. No drift, no variance, no “different answer each time”.",
   },
   {
     icon: KeyRound,
@@ -46,7 +46,7 @@ const EXTRAS = [
   {
     icon: FileSearch,
     title: "Full-document coverage",
-    body: "Every page of every file is parsed — PDFs with per-line coordinates, spreadsheets sheet-by-sheet, CSVs, DOCX and plain text. Scanned pages are detected and surfaced rather than silently skipped.",
+    body: "The complete corpus is parsed — PDFs with per-line coordinates, spreadsheets sheet-by-sheet, CSVs, DOCX and plain text. Scanned pages are detected and surfaced rather than silently skipped.",
   },
   {
     icon: GitCompareArrows,

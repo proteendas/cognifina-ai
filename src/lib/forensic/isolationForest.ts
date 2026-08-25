@@ -4,7 +4,7 @@ import { mean, stdev } from "./stats";
 /**
  * Isolation Forest — dependency-free deterministic implementation.
  * Builds an ensemble of random isolation trees with a seeded PRNG so runs are
- * fully reproducible ("Math before Models": same input ⇒ same anomalies).
+ * fully reproducible ("Statistics lead. Models follow.": same input ⇒ same anomalies).
  */
 
 export type JournalEntry = {

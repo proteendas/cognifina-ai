@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s · Cognifina",
   },
   description:
-    "Cognifina runs 25 forensic & compliance workflows — due diligence, statutory audit review, KYC/AML screening — on a deterministic multi-agent engine. Math before Models. Every finding source-cited to the exact page.",
+    "Cognifina runs 25 forensic & compliance workflows — due diligence, statutory audit review, KYC/AML screening — on a deterministic multi-agent engine. Statistics lead. Models follow. Every finding source-cited to the exact page.",
   keywords: ["forensic accounting", "due diligence", "Benford's Law", "Beneish M-Score", "Altman Z-Score", "KYC AML", "audit AI"],
   icons: { icon: [{ url: "/icon.svg", type: "image/svg+xml" }] },
   openGraph: {
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     siteName: "Cognifina",
     title: "Cognifina · Deterministic AI for forensic finance & compliance",
     description:
-      "Math before Models. Deterministic multi-agent forensics with exact page-level citations and reproducible runs.",
+      "Statistics lead. Models follow. Deterministic multi-agent forensics with exact page-level citations and reproducible runs.",
   },
 };
 
