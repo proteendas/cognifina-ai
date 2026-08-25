@@ -6,7 +6,7 @@ import { ArrowRight, Binary, KeyRound, Lock, Network, Quote, RefreshCcw, Workflo
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RiskGauge } from "@/components/visualizers/RiskGauge";
-import { CtaBand, Reveal, SectionShell } from "@/components/marketing/Blocks";
+import { CtaBand, Reveal, spring, SectionShell } from "@/components/marketing/Blocks";
 
 const TEASERS = [
   {

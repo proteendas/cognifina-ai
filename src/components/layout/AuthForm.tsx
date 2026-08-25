@@ -4,15 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Binary, Loader2 } from "lucide-react";
+import { Loader2, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+import { LogoMark, Wordmark } from "@/components/layout/Logo";
+import { SUPPORT_EMAIL } from "@/components/marketing/MarketingChrome";
 import { api } from "@/lib/client";
 
 export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") || "/workflows";
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -26,7 +28,18 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     try {
       if (mode === "register") await api.auth.register(email, name, password);
       else await api.auth.login(email, password);
-      router.push(next);
+
+      let target = params.get("next");
+      if (!target) {
+        // honour the saved "default landing page" preference
+        try {
+          const prefs = await fetch("/api/profile", { credentials: "include" }).then((r) => r.json());
+          target = typeof prefs?.preferences?.landingPage === "string" ? prefs.preferences.landingPage : "/dashboard";
+        } catch {
+          target = "/dashboard";
+        }
+      }
+      router.push(target || "/dashboard");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -36,24 +49,24 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   };
 
   return (
-    <div className="flex min-h-dvh items-center justify-center px-4">
+    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden px-4">
+      <div className="dot-grid pointer-events-none absolute inset-x-0 top-0 h-72 opacity-60" aria-hidden />
+      <div className="glow pointer-events-none absolute inset-x-0 top-0 h-72" aria-hidden />
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", bounce: 0, duration: 0.45 }}
-        className="material-thick w-full max-w-sm rounded-3xl p-8"
+        className="relative w-full max-w-sm rounded-2xl border border-line bg-surface p-8 shadow-pop"
       >
-        <Link href="/" className="mb-8 flex items-center justify-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 text-white shadow-glow-accent">
-            <Binary size={17} />
-          </span>
-          <span className="display text-xl font-bold tracking-tight text-white">Cognifina</span>
+        <Link href="/" className="mb-7 flex items-center justify-center gap-2.5">
+          <LogoMark />
+          <Wordmark className="text-[16px]" />
         </Link>
 
-        <h1 className="display text-center text-[22px] font-bold tracking-tight text-white">
+        <h1 className="text-center text-[22px] font-bold tracking-tight text-ink">
           {mode === "login" ? "Welcome back" : "Create your workspace"}
         </h1>
-        <p className="mt-1.5 text-center text-[13px] text-slate-400">
+        <p className="mt-1.5 text-center font-secondary text-[13px] leading-relaxed text-ink-3">
           {mode === "login" ? "Sign in to your forensic workspace." : "Free to start. Bring your own model keys."}
         </p>
 
@@ -70,9 +83,8 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="password">Password</Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -82,7 +94,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
             />
           </div>
 
-          {error && <p className="rounded-lg bg-rose-500/10 px-3 py-2 text-[13px] text-rose-300">{error}</p>}
+          {error && <p className="rounded-lg bg-danger-soft px-3 py-2 font-secondary text-[13px] text-danger">{error}</p>}
 
           <Button type="submit" size="lg" className="w-full" disabled={busy}>
             {busy && <Loader2 size={15} className="animate-spin" />}
@@ -90,22 +102,30 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-[13px] text-slate-400">
+        <p className="mt-6 text-center font-secondary text-[13px] text-ink-3">
           {mode === "login" ? (
             <>
               New here?{" "}
-              <Link href="/register" className="font-medium text-indigo-300 hover:text-indigo-200">
+              <Link href="/register" className="font-medium text-accent hover:underline">
                 Create an account
               </Link>
             </>
           ) : (
             <>
               Already have a workspace?{" "}
-              <Link href="/login" className="font-medium text-indigo-300 hover:text-indigo-200">
+              <Link href="/login" className="font-medium text-accent hover:underline">
                 Sign in
               </Link>
             </>
           )}
+        </p>
+
+        <p className="mt-4 flex items-center justify-center gap-1.5 border-t border-line pt-4 text-[11.5px] text-ink-4">
+          <Mail size={11} />
+          Need help?{" "}
+          <a href={`mailto:${SUPPORT_EMAIL}`} className="font-medium hover:text-accent">
+            {SUPPORT_EMAIL}
+          </a>
         </p>
       </motion.div>
     </div>

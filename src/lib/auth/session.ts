@@ -30,7 +30,7 @@ export function verifyPassword(password: string, stored: string): boolean {
 
 // ---------- session tokens (HMAC-signed payload) ----------
 
-type SessionPayload = { uid: string; exp: number };
+type SessionPayload = { uid: string; ep: number; exp: number };
 
 function sign(data: string): string {
   return createHash("sha256")
@@ -38,8 +38,19 @@ function sign(data: string): string {
     .digest("base64url");
 }
 
-export function createSessionToken(userId: string): string {
-  const payload: SessionPayload = { uid: userId, exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS };
+export async function createSessionToken(userId: string): Promise<string> {
+  // Bind the token to the account's session epoch so admins can revoke all
+  // sessions server-side by bumping a single integer.
+  const [row] = await db
+    .select({ epoch: users.sessionEpoch })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  const payload: SessionPayload = {
+    uid: userId,
+    ep: row?.epoch ?? 0,
+    exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
+  };
   const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
   return `${body}.${sign(body)}`;
 }
@@ -50,7 +61,7 @@ export function verifySessionToken(token: string): SessionPayload | null {
     if (!body || !sig) return null;
     if (sign(body) !== sig) return null;
     const payload = JSON.parse(Buffer.from(body, "base64url").toString()) as SessionPayload;
-    if (!payload.uid || payload.exp < Date.now() / 1000) return null;
+    if (!payload.uid || typeof payload.ep !== "number" || payload.exp < Date.now() / 1000) return null;
     return payload;
   } catch {
     return null;
@@ -58,7 +69,7 @@ export function verifySessionToken(token: string): SessionPayload | null {
 }
 
 export async function setSessionCookie(userId: string): Promise<void> {
-  cookies().set(SESSION_COOKIE, createSessionToken(userId), {
+  cookies().set(SESSION_COOKIE, await createSessionToken(userId), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -71,7 +82,13 @@ export async function clearSessionCookie(): Promise<void> {
   cookies().delete(SESSION_COOKIE);
 }
 
-export type SessionUser = { id: string; email: string; name: string };
+export type SessionUser = {
+  id: string;
+  email: string;
+  name: string;
+  role: "USER" | "SUPER_ADMIN";
+  status: "active" | "suspended";
+};
 
 export async function getCurrentUser(): Promise<SessionUser | null> {
   const token = cookies().get(SESSION_COOKIE)?.value;
@@ -79,16 +96,32 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   const payload = verifySessionToken(token);
   if (!payload) return null;
   const rows = await db
-    .select({ id: users.id, email: users.email, name: users.name })
+    .select({
+      id: users.id,
+      email: users.email,
+      name: users.name,
+      role: users.role,
+      status: users.status,
+      epoch: users.sessionEpoch,
+    })
     .from(users)
     .where(eq(users.id, payload.uid))
     .limit(1);
-  return rows[0] ?? null;
+  const row = rows[0];
+  // Suspended accounts and stale-epoch tokens (revoked sessions) resolve to no user.
+  if (!row || row.status !== "active" || row.epoch !== payload.ep) return null;
+  return { id: row.id, email: row.email, name: row.name, role: row.role, status: row.status };
 }
 
 export class UnauthorizedError extends Error {
   constructor() {
     super("Unauthorized");
+  }
+}
+
+export class ForbiddenError extends Error {
+  constructor(message = "Forbidden") {
+    super(message);
   }
 }
 

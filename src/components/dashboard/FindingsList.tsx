@@ -29,7 +29,7 @@ export function FindingsList({
 
   if (findings.length === 0) {
     return (
-      <div className="material rounded-2xl px-6 py-10 text-center text-sm text-slate-400">
+      <div className="rounded-xl border border-line bg-surface px-6 py-10 text-center font-secondary text-sm text-ink-4 shadow-soft">
         No findings met reporting thresholds for this run.
       </div>
     );
@@ -47,9 +47,10 @@ export function FindingsList({
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: "spring", bounce: 0, duration: 0.4, delay: Math.min(i * 0.03, 0.2) }}
             className={cn(
-              "material overflow-hidden rounded-2xl transition-colors",
-              f.severity === "critical" && "border-rose-500/30",
-              f.severity === "high" && "border-orange-400/25"
+              "overflow-hidden rounded-xl border bg-surface shadow-soft transition-shadow",
+              f.severity === "critical" && "border-danger/30",
+              f.severity === "high" && "border-[#ce6a23]/30",
+              f.severity !== "critical" && f.severity !== "high" && "border-line"
             )}
           >
             <button
@@ -60,13 +61,13 @@ export function FindingsList({
               <Badge severity={f.severity} className="mt-0.5 shrink-0">
                 {f.severity}
               </Badge>
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] uppercase tracking-wider text-slate-500">
+              <span className="min-w-0 flex-1">
+                <span className="tnum block text-[11px] font-medium uppercase tracking-wider text-ink-4">
                   {f.ref} · {f.category}
-                </p>
-                <h3 className="mt-0.5 text-[15px] font-semibold leading-snug tracking-tight text-slate-100">{f.title}</h3>
-              </div>
-              <span className="flex items-center gap-2 text-[12px] text-slate-500">
+                </span>
+                <span className="mt-1 block text-[15px] font-semibold leading-snug tracking-tight text-ink">{f.title}</span>
+              </span>
+              <span className="flex shrink-0 items-center gap-2 pt-0.5 text-[12px] text-ink-4">
                 {cites.length > 0 && (
                   <span className="tnum flex items-center gap-1">
                     <Quote size={12} /> {cites.length}
@@ -76,17 +77,17 @@ export function FindingsList({
               </span>
             </button>
             {open && (
-              <div className="space-y-4 border-t border-white/6 px-5 pb-5 pt-4">
-                <p className="text-[13.5px] leading-relaxed text-slate-300">{f.description}</p>
+              <div className="space-y-4 border-t border-line px-5 pb-5 pt-4">
+                <p className="font-secondary text-[13.5px] leading-relaxed text-ink-2">{f.description}</p>
                 {f.recommendation && (
-                  <div className="rounded-xl bg-indigo-500/8 px-4 py-3 ring-1 ring-inset ring-indigo-400/20">
-                    <p className="text-[12px] font-semibold uppercase tracking-wider text-indigo-300">Recommended action</p>
-                    <p className="mt-1 text-[13px] leading-relaxed text-slate-300">{f.recommendation}</p>
+                  <div className="rounded-lg border border-accent/20 bg-accent-soft px-4 py-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">Recommended action</p>
+                    <p className="mt-1 font-secondary text-[13px] leading-relaxed text-ink-2">{f.recommendation}</p>
                   </div>
                 )}
                 {cites.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Source citations</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-4">Source citations</p>
                     {cites.map((c) => (
                       <button
                         key={c.id}
@@ -100,10 +101,10 @@ export function FindingsList({
                             confidence: c.confidence,
                           })
                         }
-                        className="pressable block w-full rounded-xl border border-white/10 bg-white/[0.03] p-3.5 text-left hover:border-indigo-400/40 hover:bg-indigo-500/6"
+                        className="pressable block w-full rounded-lg border border-line bg-paper-2 p-3.5 text-left transition-colors hover:border-accent/40 hover:bg-accent-soft/50"
                       >
-                        <p className="line-clamp-2 text-[13px] leading-relaxed text-slate-300">“{c.rawExcerpt}”</p>
-                        <p className="tnum mt-1.5 text-[11px] text-slate-500">
+                        <p className="line-clamp-2 font-secondary text-[13px] leading-relaxed text-ink-2">“{c.rawExcerpt}”</p>
+                        <p className="tnum mt-1.5 font-secondary text-[11px] text-ink-4">
                           {c.documentName} · page {c.pageNumber} · {(c.confidence * 100).toFixed(0)}%
                         </p>
                       </button>

@@ -52,20 +52,20 @@ export function FileDropzone({
           if (!disabled) addFiles(e.dataTransfer.files);
         }}
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-10 text-center transition",
-          dragging ? "border-indigo-400 bg-indigo-500/8" : "border-white/12 bg-white/[0.02] hover:border-white/25",
+          "flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors",
+          dragging ? "border-accent bg-accent-soft" : "border-line-strong bg-surface hover:border-ink-4/50 hover:bg-paper-2",
           disabled && "pointer-events-none opacity-50"
         )}
       >
         <motion.div
           animate={dragging ? { scale: 1.12, y: -4 } : { scale: 1, y: 0 }}
           transition={{ type: "spring", bounce: 0.35, duration: 0.4 }}
-          className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-300"
+          className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft text-accent"
         >
           <UploadCloud size={22} />
         </motion.div>
-        <p className="text-[14px] font-medium text-slate-200">Drop documents here</p>
-        <p className="mt-1 text-[12px] text-slate-500">
+        <p className="text-[14px] font-medium text-ink">Drop documents here</p>
+        <p className="mt-1 font-secondary text-[12px] leading-relaxed text-ink-4">
           PDF · XLSX · CSV · DOCX · TXT — up to 12 files, 25&nbsp;MB each
         </p>
         <input
@@ -93,15 +93,15 @@ export function FileDropzone({
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 8 }}
                 transition={{ type: "spring", bounce: 0, duration: 0.35 }}
-                className="material flex items-center gap-3 rounded-xl px-3.5 py-2.5"
+                className="flex items-center gap-3 rounded-lg border border-line bg-surface px-3.5 py-2.5 shadow-soft"
               >
-                <FileText size={15} className="shrink-0 text-indigo-300" />
-                <span className="min-w-0 flex-1 truncate text-[13px] text-slate-200">{f.file.name}</span>
-                <span className="tnum shrink-0 text-[11px] text-slate-500">{formatBytes(f.file.size)}</span>
+                <FileText size={15} className="shrink-0 text-accent" />
+                <span className="min-w-0 flex-1 truncate text-[13px] text-ink">{f.file.name}</span>
+                <span className="tnum shrink-0 font-secondary text-[11px] text-ink-4">{formatBytes(f.file.size)}</span>
                 <button
                   onClick={() => onChange(files.filter((x) => x.id !== f.id))}
                   aria-label={`Remove ${f.file.name}`}
-                  className="pressable rounded-md p-1 text-slate-500 hover:bg-white/8 hover:text-white"
+                  className="pressable rounded-md p-1 text-ink-4 hover:bg-danger-soft hover:text-danger"
                 >
                   <X size={13} />
                 </button>
@@ -118,8 +118,8 @@ export function UploadingOverlay({ progress, label }: { progress: number; label:
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between text-[13px]">
-        <span className="font-medium text-slate-200">{label}</span>
-        <span className="tnum text-slate-400">{progress}%</span>
+        <span className="font-medium text-ink">{label}</span>
+        <span className="tnum text-ink-4">{progress}%</span>
       </div>
       <Progress value={progress} />
     </div>

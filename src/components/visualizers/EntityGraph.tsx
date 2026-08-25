@@ -14,24 +14,25 @@ import { Building2, Crown, GitBranch, Landmark, ShieldAlert, User } from "lucide
 import type { EntityEdgeDto, EntityNodeDto } from "@/lib/types";
 
 const TYPE_STYLE: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
-  company: { color: "#6366f1", icon: <Building2 size={15} />, label: "Company" },
-  subsidiary: { color: "#8b5cf6", icon: <GitBranch size={15} />, label: "Subsidiary" },
-  ubo: { color: "#f59e0b", icon: <Crown size={15} />, label: "UBO" },
-  director: { color: "#22d3ee", icon: <User size={15} />, label: "Director" },
-  person: { color: "#38bdf8", icon: <User size={15} />, label: "Person" },
-  related_party: { color: "#f43f5e", icon: <ShieldAlert size={15} />, label: "Related Party" },
-  registry: { color: "#94a3b8", icon: <Landmark size={15} />, label: "Registry" },
+  company: { color: "#0F3D3E", icon: <Building2 size={15} />, label: "Company" },
+  subsidiary: { color: "#3B6EA5", icon: <GitBranch size={15} />, label: "Subsidiary" },
+  ubo: { color: "#C98A1E", icon: <Crown size={15} />, label: "UBO" },
+  director: { color: "#1E874B", icon: <User size={15} />, label: "Director" },
+  person: { color: "#3B6EA5", icon: <User size={15} />, label: "Person" },
+  related_party: { color: "#D64545", icon: <ShieldAlert size={15} />, label: "Related Party" },
+  registry: { color: "#6F767E", icon: <Landmark size={15} />, label: "Registry" },
 };
 
 function nodeStyle(type: string) {
   const s = TYPE_STYLE[type] ?? TYPE_STYLE.company;
   return {
-    background: "rgba(12,14,26,0.92)",
+    background: "#ffffff",
     border: `1.5px solid ${s.color}`,
-    borderRadius: 14,
+    borderRadius: 12,
     padding: "10px 14px",
-    boxShadow: `0 4px 24px -6px ${s.color}55`,
+    boxShadow: "0 2px 4px -1px rgba(26,29,31,0.05), 0 8px 20px -6px rgba(26,29,31,0.10)",
     width: 200,
+    fontSize: 13,
   };
 }
 
@@ -47,11 +48,11 @@ function EntityNodeCard({ data }: { data: Record<string, unknown> }) {
     <div>
       <div className="flex items-center gap-2">
         <span style={{ color: s.color }}>{s.icon}</span>
-        <span className="truncate text-[13px] font-semibold text-slate-100">{name}</span>
+        <span className="truncate text-[13px] font-semibold text-[#1a1d1f]">{name}</span>
       </div>
-      <div className="mt-1 flex items-center justify-between text-[10px] uppercase tracking-wider text-slate-500">
+      <div className="mt-1 flex items-center justify-between text-[10px] uppercase tracking-wider text-[#8b9096]">
         <span>{s.label}</span>
-        {metaLine && <span className="tnum truncate pl-2 normal-case text-slate-500">{metaLine}</span>}
+        {metaLine && <span className="tnum truncate pl-2 normal-case">{metaLine}</span>}
       </div>
     </div>
   );
@@ -114,11 +115,11 @@ export function EntityGraph({
       target: e.target,
       animated: false,
       label: e.relation,
-      labelStyle: { fill: "#8394b8", fontSize: 10 },
-      labelBgStyle: { fill: "rgba(7,8,15,0.85)" },
+      labelStyle: { fill: "#6f767e", fontSize: 10 },
+      labelBgStyle: { fill: "rgba(255,255,255,0.95)" },
       labelBgPadding: [5, 3] as [number, number],
       labelBgBorderRadius: 6,
-      style: { stroke: "rgba(148,163,184,0.45)", strokeWidth: 1.5 },
+      style: { stroke: "rgba(26,29,31,0.28)", strokeWidth: 1.5 },
     }));
 
     return { flowNodes, flowEdges };
@@ -126,14 +127,14 @@ export function EntityGraph({
 
   if (nodes.length === 0) {
     return (
-      <div className="material flex h-[420px] items-center justify-center rounded-2xl text-sm text-slate-400">
+      <div className="flex h-[420px] items-center justify-center rounded-xl border border-line bg-surface text-sm text-ink-4 shadow-soft">
         No entities were resolved from this document set.
       </div>
     );
   }
 
   return (
-    <div className="material h-[520px] overflow-hidden rounded-2xl">
+    <div className="h-[520px] overflow-hidden rounded-xl border border-line bg-surface shadow-soft">
       <ReactFlow
         nodes={layout.flowNodes}
         edges={layout.flowEdges}
@@ -146,14 +147,14 @@ export function EntityGraph({
         nodesConnectable={false}
         defaultViewport={{ x: 0, y: 0, zoom: 0.9 }}
       >
-        <Background color="#1e2438" gap={22} />
+        <Background color="#DAD7D1" gap={22} />
         <Controls showInteractive={false} />
         <MiniMap
           pannable
           zoomable
-          maskColor="rgba(7,8,15,0.75)"
-          style={{ background: "#0c0e1a", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 10 }}
-          nodeColor={(n) => TYPE_STYLE[String((n.data as Record<string, unknown>).type)]?.color ?? "#6366f1"}
+          maskColor="rgba(245,243,238,0.75)"
+          style={{ background: "#FBFAF8", border: "1px solid #E8E6E3", borderRadius: 10 }}
+          nodeColor={(n) => TYPE_STYLE[String((n.data as Record<string, unknown>).type)]?.color ?? "#0F3D3E"}
         />
       </ReactFlow>
     </div>

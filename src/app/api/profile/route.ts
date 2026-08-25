@@ -19,6 +19,17 @@ const patchSchema = z.object({
   preferences: z.record(z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
 });
 
+export async function GET() {
+  try {
+    const user = await requireUser();
+    const [row] = await db.select({ prefs: users.preferences }).from(users).where(eq(users.id, user.id)).limit(1);
+    return NextResponse.json({ preferences: row?.prefs ?? {} });
+  } catch (err) {
+    if (err instanceof UnauthorizedError) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    throw err;
+  }
+}
+
 export async function PATCH(request: Request) {
   try {
     const user = await requireUser();

@@ -82,26 +82,26 @@ export function CitationDrawer({
                 <Badge>{(citation.confidence * 100).toFixed(0)}% confidence</Badge>
               )}
             </div>
-            <blockquote className="rounded-xl border-l-[3px] border-indigo-400/70 bg-white/[0.04] px-4 py-3 text-[13.5px] leading-relaxed text-slate-200">
+            <blockquote className="rounded-lg border-l-[3px] border-accent bg-paper-2 px-4 py-3 font-secondary text-[13.5px] leading-relaxed text-ink-2">
               “{citation.rawExcerpt}”
             </blockquote>
           </div>
 
           <div>
-            <h3 className="mb-2 flex items-center gap-1.5 text-[13px] font-semibold text-slate-300">
-              <MapPin size={13} className="text-indigo-300" /> Page reconstruction
+            <h3 className="mb-2 flex items-center gap-1.5 text-[13px] font-semibold text-ink">
+              <MapPin size={13} className="text-accent" /> Page reconstruction
             </h3>
             {loading ? (
-              <div className="flex h-48 items-center justify-center rounded-xl border border-white/8 text-slate-400">
+              <div className="flex h-48 items-center justify-center rounded-lg border border-line bg-surface-2 text-ink-4">
                 <Loader2 className="animate-spin" size={18} />
               </div>
             ) : error || !blocks || blocks.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-white/12 px-4 py-8 text-center text-[13px] text-slate-500">
+              <div className="rounded-lg border border-dashed border-line-strong px-4 py-8 text-center font-secondary text-[13px] text-ink-4">
                 {error ?? "This document has no extractable text on the cited page (scanned image)."}
               </div>
             ) : bounds && hasGeometry ? (
               <div
-                className="relative overflow-hidden rounded-xl border border-white/8 bg-ink-950/80"
+                className="relative overflow-hidden rounded-lg border border-line bg-white"
                 style={{
                   height: 380,
                 }}
@@ -122,19 +122,19 @@ export function CitationDrawer({
                     return (
                       <div
                         key={b.id}
-                        className={`absolute whitespace-pre rounded ${isTarget ? "bg-indigo-500/25 ring-2 ring-indigo-400 animate-pulse-soft" : "text-slate-400"}`}
+                        className={`absolute whitespace-pre rounded ${isTarget ? "bg-lime/60 ring-2 ring-accent animate-pulse-soft" : "text-ink-4"}`}
                         style={{ left: x, top: y, width: Math.max(w, 10), minHeight: h }}
                       >
-                        <span className="text-[9px] leading-tight">{b.text}</span>
+                        <span className="text-[9px] font-secondary leading-tight">{b.text}</span>
                       </div>
                     );
                   })}
                 </div>
               </div>
             ) : (
-              <div className="max-h-[380px] space-y-2 overflow-y-auto rounded-xl border border-white/8 p-4">
+              <div className="max-h-[380px] space-y-2 overflow-y-auto rounded-lg border border-line p-4">
                 {blocks.slice(0, 60).map((b) => (
-                  <p key={b.id} className="text-[12.5px] leading-relaxed text-slate-400">
+                  <p key={b.id} className="font-secondary text-[12.5px] leading-relaxed text-ink-2">
                     {b.text}
                   </p>
                 ))}
@@ -142,7 +142,7 @@ export function CitationDrawer({
             )}
           </div>
 
-          <p className="flex items-center gap-1.5 text-[11px] text-slate-500">
+          <p className="flex items-center gap-1.5 font-secondary text-[11px] text-ink-4">
             <Hash size={11} /> Coordinates are stored per extraction block — citations are reproducible across runs.
           </p>
         </div>

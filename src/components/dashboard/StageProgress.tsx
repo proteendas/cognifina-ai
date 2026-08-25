@@ -3,7 +3,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import {
   CheckCircle2,
-  Circle,
   FileSearch,
   Sigma,
   Network,
@@ -38,18 +37,18 @@ export function StageProgress({
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: "spring", bounce: 0, duration: 0.4, delay: i * 0.04 }}
             className={cn(
-              "flex items-center gap-3 rounded-xl border px-3.5 py-3",
+              "flex items-center gap-3 rounded-lg border px-3.5 py-3",
               done
-                ? "border-emerald-400/25 bg-emerald-400/6"
+                ? "border-success/25 bg-success-soft"
                 : active
-                  ? "border-indigo-400/40 bg-indigo-400/8"
-                  : "border-white/8 bg-white/[0.03]"
+                  ? "border-accent/30 bg-accent-soft"
+                  : "border-line bg-paper-2"
             )}
           >
             <span
               className={cn(
                 "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
-                done ? "bg-emerald-400/15 text-emerald-300" : active ? "bg-indigo-400/15 text-indigo-300" : "bg-white/5 text-slate-500"
+                done ? "bg-success/10 text-success" : active ? "bg-accent/10 text-accent" : "bg-surface text-ink-4"
               )}
             >
               {done ? (
@@ -61,12 +60,11 @@ export function StageProgress({
               )}
             </span>
             <div className="min-w-0">
-              <p className="text-[11px] uppercase tracking-wider text-slate-500">Agent {i + 1}</p>
-              <p className={cn("truncate text-[13px] font-medium", done || active ? "text-slate-200" : "text-slate-500")}>
+              <p className="tnum text-[10px] font-medium uppercase tracking-wider text-ink-4">Agent {i + 1}</p>
+              <p className={cn("truncate text-[13px] font-medium", done || active ? "text-ink" : "text-ink-4")}>
                 {label}
               </p>
             </div>
-            {!done && active && <Circle className="ml-auto h-2 w-2 animate-pulse-soft fill-indigo-400 text-indigo-400" />}
           </motion.li>
         );
       })}

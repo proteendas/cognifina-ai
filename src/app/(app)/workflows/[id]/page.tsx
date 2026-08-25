@@ -69,7 +69,7 @@ export default function WorkflowDetailPage({ params }: { params: { id: string } 
 
   if (!workflow) {
     return (
-      <div className="flex h-64 items-center justify-center gap-2 text-slate-400">
+      <div className="flex h-64 items-center justify-center gap-2 text-[13.5px] text-ink-4">
         <Loader2 className="animate-spin" size={16} /> Loading workflow…
       </div>
     );
@@ -77,28 +77,29 @@ export default function WorkflowDetailPage({ params }: { params: { id: string } 
 
   return (
     <div className="mx-auto max-w-3xl">
-      <Link href="/workflows" className="pressable mb-6 inline-flex items-center gap-1.5 text-[13px] text-slate-400 hover:text-white">
+      <Link href="/workflows" className="pressable mb-6 inline-flex items-center gap-1.5 text-[13px] font-medium text-ink-3 hover:text-accent">
         <ArrowLeft size={14} /> All workflows
       </Link>
 
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", bounce: 0, duration: 0.4 }}>
         <Badge>{workflow.category}</Badge>
-        <h1 className="display mt-2 text-[26px] font-bold tracking-tight text-white">{workflow.name}</h1>
-        <p className="mt-2 max-w-xl text-[13.5px] leading-relaxed text-slate-400">{workflow.description}</p>
+        <h1 className="display-md mt-2.5 text-ink">{workflow.name}</h1>
+        <p className="mt-2 max-w-xl font-secondary text-[13.5px] leading-relaxed text-ink-3">{workflow.description}</p>
       </motion.div>
 
-      <div className="material mt-7 rounded-2xl p-5">
-        <h2 className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-wider text-slate-300">
-          <ShieldCheck size={14} className="text-emerald-300" /> Recommended documents
-        </h2>
-        <ul className="mt-3 grid gap-1.5 sm:grid-cols-2">
+      <section className="mt-7 rounded-xl border border-line bg-surface shadow-soft">
+        <header className="flex items-center gap-2 border-b border-line px-5 py-4">
+          <ShieldCheck size={14} className="text-success" />
+          <h2 className="text-[12px] font-semibold uppercase tracking-wider text-ink-3">Recommended documents</h2>
+        </header>
+        <ul className="grid gap-1.5 p-5 sm:grid-cols-2">
           {workflow.recommendedDocs.map((d) => (
-            <li key={d} className="rounded-lg bg-white/4 px-3 py-2 text-[12.5px] text-slate-300">
+            <li key={d} className="rounded-lg border border-line bg-paper-2 px-3 py-2 font-secondary text-[12.5px] text-ink-2">
               {d}
             </li>
           ))}
         </ul>
-      </div>
+      </section>
 
       <div className="mt-5 space-y-5">
         <FileDropzone files={files} onChange={setFiles} disabled={uploading} />
@@ -114,8 +115,8 @@ export default function WorkflowDetailPage({ params }: { params: { id: string } 
           </div>
         </div>
 
-        <div className="material rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Deterministic checks</p>
+        <div className="rounded-xl border border-line bg-surface p-4 shadow-soft">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-4">Deterministic checks</p>
           <div className="mt-2.5 flex flex-wrap gap-2">
             {Object.entries(CHECK_LABELS).map(([key, label]) => {
               const enabledHere = workflow.checks.includes(key);
@@ -133,12 +134,12 @@ export default function WorkflowDetailPage({ params }: { params: { id: string } 
                     })
                   }
                   className={cn(
-                    "pressable rounded-full border px-3 py-1.5 text-[12px] font-medium transition",
+                    "pressable rounded-full border px-3 py-1.5 text-[12px] font-medium transition-colors",
                     on && enabledHere
-                      ? "border-indigo-400/50 bg-indigo-500/15 text-indigo-200"
+                      ? "border-accent/30 bg-accent-soft text-accent"
                       : enabledHere
-                        ? "border-white/12 text-slate-400 hover:text-slate-200"
-                        : "cursor-not-allowed border-white/6 text-slate-600 line-through"
+                        ? "border-line-strong bg-surface text-ink-3 hover:text-ink"
+                        : "cursor-not-allowed border-line bg-paper-2 text-ink-4/60 line-through"
                   )}
                   title={enabledHere ? undefined : "Not part of this workflow"}
                 >
@@ -152,7 +153,7 @@ export default function WorkflowDetailPage({ params }: { params: { id: string } 
         {uploading ? (
           <UploadingOverlay progress={Math.round(uploadPct)} label="Uploading & queueing run…" />
         ) : (
-          error && <p className="text-[13px] text-rose-300">{error}</p>
+          error && <p className="font-secondary text-[13px] text-danger">{error}</p>
         )}
 
         <Button size="lg" onClick={start} disabled={files.length === 0 || uploading} className="w-full">

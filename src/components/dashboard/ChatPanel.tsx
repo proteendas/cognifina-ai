@@ -54,15 +54,15 @@ export function ChatPanel({
 
   return (
     <div className="flex h-full min-h-[520px] flex-col">
-      <div ref={scrollRef} className="material flex-1 space-y-4 overflow-y-auto rounded-2xl p-5">
+      <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto rounded-xl border border-line bg-surface p-5 shadow-soft">
         {messages.length === 0 && (
           <div className="flex h-full flex-col items-center justify-center gap-4 py-10 text-center">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-300">
+            <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft text-accent">
               <Sparkles size={20} />
             </span>
             <div>
-              <p className="text-[15px] font-semibold text-slate-200">Interrogate the evidence</p>
-              <p className="mx-auto mt-1 max-w-md text-[13px] leading-relaxed text-slate-500">
+              <p className="text-[15px] font-semibold text-ink">Interrogate the evidence</p>
+              <p className="mx-auto mt-1 max-w-md font-secondary text-[13px] leading-relaxed text-ink-3">
                 Answers are grounded strictly in this run&apos;s extracted passages and computed metrics. When evidence is
                 missing, the assistant says so — it never speculates.
               </p>
@@ -72,7 +72,7 @@ export function ChatPanel({
                 <button
                   key={s}
                   onClick={() => send(s)}
-                  className="pressable rounded-full border border-white/12 px-3.5 py-1.5 text-[12px] text-slate-300 hover:border-indigo-400/40 hover:bg-indigo-500/8"
+                  className="pressable rounded-full border border-line-strong bg-surface px-3.5 py-1.5 font-secondary text-[12px] text-ink-2 transition-colors hover:border-accent/40 hover:bg-accent-soft hover:text-accent"
                 >
                   {s}
                 </button>
@@ -90,7 +90,7 @@ export function ChatPanel({
             className={cn("flex gap-3", m.role === "user" ? "justify-end" : "justify-start")}
           >
             {m.role === "assistant" && (
-              <span className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-300">
+              <span className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
                 <Sparkles size={13} />
               </span>
             )}
@@ -99,11 +99,11 @@ export function ChatPanel({
                 className={cn(
                   "rounded-2xl px-4 py-3 text-[13.5px] leading-relaxed",
                   m.role === "user"
-                    ? "bg-gradient-to-b from-indigo-500 to-indigo-600 text-white"
-                    : "border border-white/8 bg-white/[0.04] text-slate-200"
+                    ? "bg-accent text-white shadow-soft"
+                    : "border border-line bg-paper-2 text-ink-2"
                 )}
               >
-                <p className="whitespace-pre-wrap">{m.content}</p>
+                <p className={cn("whitespace-pre-wrap", m.role === "assistant" && "font-secondary")}>{m.content}</p>
               </div>
               {m.citations.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
@@ -111,18 +111,18 @@ export function ChatPanel({
                     <button
                       key={ci}
                       onClick={() => onOpenCitation(c)}
-                      className="pressable flex items-center gap-1 rounded-full border border-white/12 bg-white/[0.04] px-2.5 py-1 text-[11px] text-slate-300 hover:border-indigo-400/50 hover:text-white"
+                      className="pressable flex items-center gap-1 rounded-full border border-line bg-paper-2 px-2.5 py-1 text-[11px] text-ink-3 transition-colors hover:border-accent/40 hover:text-accent"
                     >
                       <Quote size={10} />
                       <span className="max-w-[220px] truncate">{c.documentName}</span>
-                      <span className="tnum text-slate-500">p.{c.pageNumber}</span>
+                      <span className="tnum text-ink-4">p.{c.pageNumber}</span>
                     </button>
                   ))}
                 </div>
               )}
             </div>
             {m.role === "user" && (
-              <span className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/8 text-slate-300">
+              <span className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-line bg-paper-2 text-ink-3">
                 <User size={13} />
               </span>
             )}
@@ -130,12 +130,12 @@ export function ChatPanel({
         ))}
 
         {busy && (
-          <div className="flex items-center gap-2 text-[13px] text-slate-400">
-            <span className="h-2 w-2 animate-pulse-soft rounded-full bg-indigo-400" />
+          <div className="flex items-center gap-2 font-secondary text-[13px] text-ink-4">
+            <span className="h-2 w-2 animate-pulse-soft rounded-full bg-accent" />
             Retrieving from evidence pack…
           </div>
         )}
-        {error && <p className="text-[13px] text-rose-300">{error}</p>}
+        {error && <p className="font-secondary text-[13px] text-danger">{error}</p>}
       </div>
 
       <form

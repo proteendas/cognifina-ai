@@ -24,7 +24,7 @@ export default function RunOverviewPage() {
 
   if (loading) {
     return (
-      <div className="flex h-56 items-center justify-center gap-2 text-slate-400">
+      <div className="flex h-56 items-center justify-center gap-2 text-[13.5px] text-ink-4">
         <Loader2 className="animate-spin" size={16} /> Loading run…
       </div>
     );
@@ -36,13 +36,13 @@ export default function RunOverviewPage() {
 
   if (run.status === "failed") {
     return (
-      <div className="material rounded-2xl p-6">
-        <div className="flex items-center gap-2 text-rose-300">
+      <div className="rounded-xl border border-line bg-surface p-6 shadow-soft">
+        <div className="flex items-center gap-2 text-danger">
           <AlertTriangle size={18} />
           <h2 className="text-[15px] font-semibold">Run failed</h2>
         </div>
-        <p className="tnum mt-3 rounded-xl bg-rose-500/8 p-4 text-[13px] leading-relaxed text-rose-200">{run.error}</p>
-        <p className="mt-3 text-[12.5px] text-slate-500">
+        <p className="tnum mt-3 rounded-lg bg-danger-soft p-4 font-secondary text-[13px] leading-relaxed text-danger">{run.error}</p>
+        <p className="mt-3 font-secondary text-[12.5px] leading-relaxed text-ink-4">
           Fix the reported issue (often a malformed document) and start a new run. Completed stages up to the failure are preserved.
         </p>
       </div>
@@ -52,18 +52,18 @@ export default function RunOverviewPage() {
   if (run.status !== "completed") {
     return (
       <div className="space-y-5">
-        <div className="material rounded-2xl p-5">
+        <div className="rounded-xl border border-line bg-surface p-5 shadow-soft">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-[14px] font-semibold text-slate-100">Pipeline execution</h2>
-            <span className="tnum text-[13px] text-indigo-300">{run.progress}%</span>
+            <h2 className="text-[14px] font-semibold text-ink">Pipeline execution</h2>
+            <span className="tnum text-[13px] font-semibold text-accent">{run.progress}%</span>
           </div>
           <StageProgress currentStage={run.currentStage} status={run.status} />
-          <p className="mt-4 text-center text-[12px] text-slate-500">
+          <p className="mt-4 text-center font-secondary text-[12px] text-ink-4">
             Stages advance automatically — each agent runs to completion before the next starts.
           </p>
         </div>
         {error && (
-          <div className="material rounded-2xl border-rose-500/30 p-4 text-[13px] text-rose-300">
+          <div className="rounded-xl border border-danger/30 bg-danger-soft/60 p-4 font-secondary text-[13px] text-danger">
             {error}
             <Button variant="secondary" size="sm" className="ml-3" onClick={() => void advance()}>
               Retry stage
@@ -85,22 +85,24 @@ export default function RunOverviewPage() {
     <div className="space-y-5">
       {/* summary strip */}
       <div className="grid gap-4 lg:grid-cols-[300px_1fr]">
-        <div className="material flex flex-col items-center justify-center rounded-2xl py-7">
-          <RiskGauge score={data.run.riskScore} band={data.run.riskBand} size={210} />
+        <div className="flex items-center justify-center rounded-xl border border-line bg-surface py-7 shadow-soft">
+          <RiskGauge score={data.run.riskScore} band={data.run.riskBand} size={200} />
         </div>
-        <div className="material grid grid-cols-2 content-start gap-3 rounded-2xl p-5 sm:grid-cols-3">
+        <div className="grid grid-cols-2 content-start gap-3 rounded-xl border border-line bg-surface p-5 shadow-soft sm:grid-cols-3">
           {(["critical", "high", "medium", "low", "info"] as Severity[]).map((s) => (
-            <div key={s} className="rounded-xl bg-white/[0.03] px-4 py-3 ring-1 ring-inset ring-white/6">
+            <div key={s} className="rounded-lg border border-line bg-paper-2 px-4 py-3">
               <Badge severity={s}>{s}</Badge>
-              <p className="tnum mt-2 text-2xl font-bold text-white">{counts[s] ?? 0}</p>
+              <p className="tnum mt-2 text-2xl font-bold leading-none tracking-tight text-ink">{counts[s] ?? 0}</p>
             </div>
           ))}
-          <div className="rounded-xl bg-white/[0.03] px-4 py-3 ring-1 ring-inset ring-white/6">
-            <p className="text-[11px] uppercase tracking-wider text-slate-500">Evidence</p>
-            <p className="tnum mt-1 flex items-center gap-1.5 text-[13px] font-medium text-slate-200">
-              <FileText size={12} /> {data.documents.length} docs
-              <Table2 size={12} className="ml-1.5" /> {data.tables.length} tables
-              <Layers size={12} className="ml-1.5" /> {data.run.summary?.blocksExtracted ?? 0} blocks
+          <div className="rounded-lg border border-line bg-paper-2 px-4 py-3">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-ink-4">Evidence</p>
+            <p className="tnum mt-1.5 flex items-center gap-1.5 font-secondary text-[12px] font-medium text-ink-2">
+              <FileText size={12} className="shrink-0" /> {data.documents.length} docs
+            </p>
+            <p className="tnum mt-1 flex items-center gap-1.5 font-secondary text-[12px] font-medium text-ink-2">
+              <Table2 size={12} className="shrink-0" /> {data.tables.length} tables
+              <Layers size={12} className="ml-1.5 shrink-0" /> {data.run.summary?.blocksExtracted ?? 0} blocks
             </p>
           </div>
         </div>
@@ -108,14 +110,14 @@ export default function RunOverviewPage() {
 
       {/* report */}
       {data.run.reportMd && (
-        <details className="material group rounded-2xl">
-          <summary className="pressable cursor-pointer list-none px-5 py-4 text-[13.5px] font-semibold text-slate-200 [&::-webkit-details-marker]:hidden">
+        <details className="group overflow-hidden rounded-xl border border-line bg-surface shadow-soft">
+          <summary className="pressable cursor-pointer list-none px-5 py-4 text-[13.5px] font-semibold text-ink [&::-webkit-details-marker]:hidden">
             Forensic report (markdown)
-            <span className="ml-2 text-[11px] font-normal uppercase tracking-wider text-indigo-300 opacity-0 transition-opacity group-open:opacity-100">
+            <span className="ml-2 text-[11px] font-normal uppercase tracking-wider text-accent opacity-0 transition-opacity group-open:opacity-100">
               open
             </span>
           </summary>
-          <div className="report-md max-h-[480px] overflow-y-auto border-t border-white/6 px-5 py-4 text-[13.5px]" dangerouslySetInnerHTML={{ __html: renderMarkdownLite(data.run.reportMd) }} />
+          <div className="report-md max-h-[480px] overflow-y-auto border-t border-line px-5 py-4 text-[13.5px]" dangerouslySetInnerHTML={{ __html: renderMarkdownLite(data.run.reportMd) }} />
         </details>
       )}
 
@@ -130,9 +132,9 @@ export default function RunOverviewPage() {
 
 function ErrorState({ message, onAdvance }: { message: string; onAdvance: () => void }) {
   return (
-    <div className="material rounded-2xl p-6 text-center">
-      <AlertTriangle className="mx-auto mb-3 text-rose-300" size={20} />
-      <p className="text-[14px] font-medium text-slate-200">{message}</p>
+    <div className="rounded-xl border border-line bg-surface p-6 text-center shadow-soft">
+      <AlertTriangle className="mx-auto mb-3 text-danger" size={20} />
+      <p className="text-[14px] font-medium text-ink">{message}</p>
       <Button variant="secondary" size="sm" className="mt-4" onClick={onAdvance}>
         Retry
       </Button>
