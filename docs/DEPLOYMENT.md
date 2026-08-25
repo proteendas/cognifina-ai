@@ -18,7 +18,7 @@ Everything needed to take this repo from clone to production, including the Supe
 
 | Variable | Required | How to generate / where to get |
 |---|---|---|
-| `DATABASE_URL` | ✅ | From Vercel Postgres / Neon dashboard, or `postgres://user:pass@host:5432/db` |
+| `CFA_DATABASE_URL` | ✅ | From Vercel Postgres / Neon dashboard, or `postgres://user:pass@host:5432/db` |
 | `ENCRYPTION_KEY` | ✅ | `openssl rand -hex 32` — derives the AES-256-GCM vault key (rotating it makes stored API keys unreadable) |
 | `SESSION_SECRET` | ✅ | `openssl rand -hex 32` — signs session cookies (rotating it signs everyone out) |
 | `NEXT_PUBLIC_APP_URL` | ✅ | e.g. `https://your-domain.com` |
@@ -34,13 +34,13 @@ Local development uses `.env.local` (gitignored). Copy `.env.example` and fill i
 npm install
 cp .env.example .env.local          # then edit values
 
-# throwaway Postgres via Docker (or point DATABASE_URL anywhere reachable)
+# throwaway Postgres via Docker (or point CFA_DATABASE_URL anywhere reachable)
 docker run -d --name cognifina-pg \
   -e POSTGRES_PASSWORD=cognifina -e POSTGRES_DB=cognifina \
   -p 54329:5432 postgres:16-alpine
 
 # push the Drizzle schema (idempotent)
-DATABASE_URL="postgres://postgres:cognifina@localhost:54329/cognifina" \
+CFA_DATABASE_URL="postgres://postgres:cognifina@localhost:54329/cognifina" \
   npx drizzle-kit push
 
 npm run dev                         # http://localhost:3000
@@ -62,7 +62,7 @@ node scripts/test-admin-security.mjs http://localhost:3000   # authz integration
 This project uses **drizzle-kit push** (schema-in-TS is the source of truth):
 
 ```bash
-DATABASE_URL="<target-db-url>" npx drizzle-kit push
+CFA_DATABASE_URL="<target-db-url>" npx drizzle-kit push
 ```
 
 Run it against production once per schema change (it applies additive diffs; destructive changes prompt). For teams that prefer reviewed migrations, switch to `drizzle-kit generate` + `migrate` — the schema file does not change.
@@ -75,7 +75,7 @@ Run it against production once per schema change (it applies additive diffs; des
 2. Provision **Vercel Postgres** (or Neon) and add the environment variables from §2 under *Settings → Environment Variables* (Production + Preview).
 3. Apply the schema once against the production database:
    ```bash
-   DATABASE_URL="<prod-url>" npx drizzle-kit push
+   CFA_DATABASE_URL="<prod-url>" npx drizzle-kit push
    ```
 4. Deploy. No workers/queues exist — the pipeline executes as stage-per-request (`POST /api/runs/:id/advance`), which fits serverless limits by design.
 5. Warm-verify: load `/`, register an account, run a workflow end-to-end, open Evidence Chat.
@@ -93,7 +93,7 @@ Roles live in the database; there is no sign-up path to SUPER_ADMIN (by design).
 2. **Promote it** from any machine that can reach the production database:
 
 ```bash
-DATABASE_URL="<prod-url>" node scripts/promote-admin.mjs you@yourdomain.com
+CFA_DATABASE_URL="<prod-url>" node scripts/promote-admin.mjs you@yourdomain.com
 # → ✔ you@yourdomain.com → SUPER_ADMIN (sessions revoked — sign in again)
 ```
 

@@ -1,24 +1,25 @@
 /**
  * Promote (or demote) an account to/from SUPER_ADMIN.
  *
- *   DATABASE_URL="postgres://…" node scripts/promote-admin.mjs admin@yourdomain.com
- *   DATABASE_URL="postgres://…" node scripts/promote-admin.mjs admin@yourdomain.com --revoke
+ *   CFA_DATABASE_URL="postgres://…" node scripts/promote-admin.mjs admin@yourdomain.com
+ *   CFA_DATABASE_URL="postgres://…" node scripts/promote-admin.mjs admin@yourdomain.com --revoke
  *
  * Safe for production: refuses when the account doesn't exist, bumps the
  * session epoch so the change takes effect on next sign-in.
  */
 const [email, flag] = process.argv.slice(2);
-if (!process.env.DATABASE_URL) {
-  console.error("DATABASE_URL is required: DATABASE_URL=<url> node scripts/promote-admin.mjs <email> [--revoke]");
+const databaseUrl = process.env.CFA_DATABASE_URL ?? process.env.DATABASE_URL;
+if (!databaseUrl) {
+  console.error("CFA_DATABASE_URL is required: CFA_DATABASE_URL=<url> node scripts/promote-admin.mjs <email> [--revoke]");
   process.exit(1);
 }
 if (!email || !email.includes("@")) {
-  console.error("Usage: DATABASE_URL=<url> node scripts/promote-admin.mjs <email> [--revoke]");
+  console.error("Usage: CFA_DATABASE_URL=<url> node scripts/promote-admin.mjs <email> [--revoke]");
   process.exit(1);
 }
 
 const { default: postgres } = await import("postgres");
-const client = postgres(process.env.DATABASE_URL, { max: 1 });
+const client = postgres(databaseUrl, { max: 1 });
 
 const role = flag === "--revoke" ? "USER" : "SUPER_ADMIN";
 const rows = await client`

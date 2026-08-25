@@ -35,7 +35,7 @@ cp .env.example .env.local        # then edit values (see below)
 # 3. Create the schema (any Postgres; a throwaway Docker one works)
 docker run -d --name cognifina-pg -e POSTGRES_PASSWORD=cognifina \
   -e POSTGRES_DB=cognifina -p 5432:5432 postgres:16-alpine
-DATABASE_URL="postgres://postgres:cognifina@localhost:5432/cognifina" npx drizzle-kit push
+CFA_DATABASE_URL="postgres://postgres:cognifina@localhost:5432/cognifina" npx drizzle-kit push
 
 # 4. Run
 npm run dev                       # http://localhost:3000
@@ -54,7 +54,7 @@ Then: **register → pick a workflow → drop documents → watch the six agents
 
    | Variable | Notes |
    |---|---|
-   | `DATABASE_URL` | From the Vercel Postgres dashboard |
+   | `CFA_DATABASE_URL` | From the Vercel Postgres dashboard |
    | `ENCRYPTION_KEY` | `openssl rand -hex 32` — derives the AES-256-GCM vault key |
    | `SESSION_SECRET` | `openssl rand -hex 32` — signs session cookies |
    | `NEXT_PUBLIC_APP_URL` | Your production URL |
@@ -62,7 +62,7 @@ Then: **register → pick a workflow → drop documents → watch the six agents
 
 3. Create the schema once against the production database:
    ```bash
-   DATABASE_URL="<prod url>" npx drizzle-kit push
+   CFA_DATABASE_URL="<prod url>" npx drizzle-kit push
    ```
 4. Deploy. No extra services required — the pipeline executes as stage-per-request (`POST /api/runs/:id/advance`), which fits serverless execution limits by design.
 
@@ -101,7 +101,7 @@ scripts/e2e-fixture.mjs         # deterministic test documents used for validati
 | `npm run build` / `npm start` | Production build / serve |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint (next/core-web-vitals) |
-| `npm run db:push` | Push drizzle schema to `DATABASE_URL` |
+| `npm run db:push` | Push drizzle schema to `CFA_DATABASE_URL` (or DATABASE_URL) |
 
 ---
 
