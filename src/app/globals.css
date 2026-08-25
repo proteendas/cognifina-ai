@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Cognifina design system — warm paper, flat surfaces, precise typography.
+   Plus Jakarta Sans (primary) · IBM Plex Sans (secondary) · JetBrains Mono (numerals)
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  --paper: #fafaf9;
+  --paper-2: #f5f3ee;
+  --surface: #ffffff;
+  --surface-2: #fbfaf8;
+  --line: #e8e6e3;
+  --line-strong: #dad7d1;
+
+  --ink: #1a1d1f;
+  --ink-2: #43484d;
+  --ink-3: #6f767e;
+  --ink-4: #8b9096;
+
+  --accent: #0f3d3e;
+  --accent-hover: #0b3031;
+  --accent-soft: #e8f0eb;
+  --lime: #c7f284;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01";
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-synthesis-weight: none;
+}
+
+::selection {
+  background: rgba(15, 61, 62, 0.14);
+  color: var(--ink);
+}
+
+/* ---------- focus ---------- */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px rgba(15, 61, 62, 0.4);
+  border-radius: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   INSTANT FEEDBACK — respond on press, not release.
+   -------------------------------------------------------------------------- */
+.pressable {
+  transition: transform 120ms ease-out, background-color 150ms ease-out,
+    border-color 150ms ease-out, color 150ms ease-out, box-shadow 150ms ease-out;
+}
+.pressable:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+/* --------------------------------------------------------------------------
+   TYPE SCALE — optical sizing, size-specific tracking & leading.
+   Headings/UI: Plus Jakarta Sans. Long-form copy: IBM Plex Sans.
+   -------------------------------------------------------------------------- */
+.display-hero {
+  font-size: clamp(38px, 5.6vw, 64px);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+}
+.display-lg {
+  font-size: clamp(28px, 3.6vw, 42px);
+  line-height: 1.1;
+  letter-spacing: -0.026em;
+  font-weight: 700;
+}
+.display-md {
+  font-size: clamp(21px, 2.3vw, 25px);
+  line-height: 1.16;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+.title-sm {
+  font-size: 15.5px;
+  line-height: 1.32;
+  letter-spacing: -0.012em;
+  font-weight: 600;
+}
+.lede {
+  font-family: var(--font-secondary), sans-serif;
+  font-size: clamp(15.5px, 1.5vw, 17px);
+  line-height: 1.65;
+  letter-spacing: 0.001em;
+  color: var(--ink-3);
+}
+.body-sm {
+  font-family: var(--font-secondary), sans-serif;
+  font-size: 13.5px;
+  line-height: 1.66;
+  color: var(--ink-3);
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   DECORATIVE SURFACES — quiet dot-grid + radial accent glow (hero/CTA only).
+   -------------------------------------------------------------------------- */
+.dot-grid {
+  background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(70% 60% at 50% 0%, #000 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(70% 60% at 50% 0%, #000 40%, transparent 100%);
+}
+.glow {
+  background: radial-gradient(ellipse 60% 50% at 50% 0%, var(--accent-soft), transparent 70%);
+}
+
+/* --------------------------------------------------------------------------
+   SCROLLBARS
+   -------------------------------------------------------------------------- */
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(26, 29, 31, 0.18);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* --------------------------------------------------------------------------
+   REACT FLOW THEME (light)
+   -------------------------------------------------------------------------- */
+.react-flow__attribution { display: none; }
+.react-flow__controls-button {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-bottom: 1px solid var(--line) !important;
+  fill: var(--ink-3) !important;
+}
+.react-flow__handle { background: var(--accent) !important; border: none; width: 7px; height: 7px; }
+
+/* --------------------------------------------------------------------------
+   MARKDOWN REPORT RENDERER
+   -------------------------------------------------------------------------- */
+.report-md { font-family: var(--font-secondary), sans-serif; }
+.report-md h1 { font-size: 1.35rem; font-weight: 700; margin: 1rem 0; letter-spacing: -0.02em; color: var(--ink); }
+.report-md h2 { font-size: 1.08rem; font-weight: 600; margin: 1.25rem 0 0.5rem; color: var(--ink); }
+.report-md h3 { font-size: 1rem; font-weight: 600; margin: 0.9rem 0 0.35rem; color: var(--ink); }
+.report-md p, .report-md ul { margin: 0.4rem 0; line-height: 1.68; color: var(--ink-2); }
+.report-md strong { color: var(--ink); }
+.report-md code {
+  font-family: var(--font-mono); font-size: 0.85em;
+  background: var(--paper-2); padding: 0.1em 0.35em; border-radius: 5px;
+}
+
+/* --------------------------------------------------------------------------
+   SKELETON + MOTION SAFETY
+   -------------------------------------------------------------------------- */
+.shimmer-line {
+  background: linear-gradient(90deg, var(--line) 25%, #efedea 37%, var(--line) 63%);
+  background-size: 400px 100%;
+  animation: shimmer 2.2s linear infinite;
+}
+@keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+
+.animate-pulse-soft { animation: pulseSoft 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+@keyframes pulseSoft { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .pressable, .pressable:active { transform: none !important; transition: none; }
+}
