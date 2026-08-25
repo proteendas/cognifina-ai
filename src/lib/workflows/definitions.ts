@@ -374,6 +374,20 @@ export const WORKFLOWS: WorkflowDef[] = [
       { label: "Certifications current", expectAny: ["certificate", "iso", "fairtrade"] },
     ],
   },
+  // ---------------- Custom ----------------
+  {
+    id: "custom-analysis",
+    name: "Custom Analysis",
+    category: "Due Diligence",
+    description:
+      "The full harness with every deterministic check enabled — bring any document set and let the engines loose. Use it when no template matches your scope.",
+    recommendedDocs: ["Any financial statements", "Journals / ledgers", "Invoices & registers", "Ownership or engagement notes"],
+    checks: ["benford", "beneish", "altman", "isolation_forest", "ratios", "reconciliation", "gaps"],
+    checklist: [
+      { label: "Any financial statements", expectAny: ["balance sheet", "profit", "cash flow", "trial balance"] },
+      { label: "Transaction-level register", expectAny: ["journal", "invoice", "ledger", "register"] },
+    ],
+  },
 ];
 
 export const WORKFLOW_CATEGORIES = ["Due Diligence", "Audit & Assurance", "Tax & Regulatory", "Compliance & AML"] as const;

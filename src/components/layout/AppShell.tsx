@@ -19,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { LogoMark, Wordmark } from "@/components/layout/Logo";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import { SUPPORT_EMAIL } from "@/components/marketing/MarketingChrome";
 import { api } from "@/lib/client";
 import { cn } from "@/lib/utils";
@@ -143,6 +144,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className={cn("border-t border-line", collapsed ? "px-2 py-3" : "p-3")}>
           {collapsed ? (
             <div className="flex flex-col items-center gap-1.5">
+              <NotificationBell />
               <span className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-paper-2 text-[11px] font-semibold text-ink-2">
                 {initials}
               </span>
@@ -161,10 +163,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line bg-paper-2 text-[11px] font-semibold text-ink-2">
                   {initials}
                 </span>
-                <div className="min-w-0 leading-tight">
+                <div className="min-w-0 flex-1 leading-tight">
                   <p className="truncate text-[13px] font-medium text-ink">{user?.name ?? "Account"}</p>
                   <p className="truncate text-[11px] text-ink-4">{user?.email ?? "\u00A0"}</p>
                 </div>
+                <NotificationBell />
               </div>
               <button
                 onClick={() => void logout()}

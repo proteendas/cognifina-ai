@@ -1,8 +1,10 @@
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireUser, UnauthorizedError } from "@/lib/auth/session";
 import { PROVIDERS, type ProviderId } from "@/lib/ai/registry";
 import { resolveCredential, upsertKey } from "@/lib/ai/keys";
+import { resolveDefaultModel } from "@/lib/ai/discover";
 import { testCredential, type ResolvedCredential } from "@/lib/ai/client";
 import { keyHint } from "@/lib/auth/vault";
 
@@ -25,11 +27,12 @@ export async function POST(request: Request) {
     if (apiKey) {
       // Test the pasted key without persisting it
       const spec = PROVIDERS[provider as ProviderId];
+      const base = baseUrl ?? spec.defaultBaseUrl ?? null;
       cred = {
         provider: provider as ProviderId,
         apiKey,
-        baseUrl: baseUrl ?? spec.defaultBaseUrl ?? null,
-        model: model ?? spec.models[0]?.id ?? "",
+        baseUrl: base,
+        model: model ?? (await resolveDefaultModel(spec.api, base ?? "", apiKey)),
       };
     } else {
       const resolved = await resolveCredential({ userId: user.id });

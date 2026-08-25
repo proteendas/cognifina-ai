@@ -63,6 +63,11 @@ export const api = {
     deleteKey: (provider: string) => request<{ ok: true }>(`/settings/keys?provider=${encodeURIComponent(provider)}`, { method: "DELETE" }),
     testKey: (payload: { provider: string; apiKey?: string; baseUrl?: string; model?: string }) =>
       request<{ ok: boolean; detail: string }>("/settings/test", { method: "POST", body: JSON.stringify(payload) }),
+    models: (payload: { provider: string; apiKey?: string; baseUrl?: string }) =>
+      request<{ models: string[]; source: "live" | "error" | "none"; error?: string }>("/settings/models", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
   },
   profile: {
     update: (payload: { name?: string; currentPassword?: string; newPassword?: string; preferences?: Record<string, string | number | boolean | null> }) =>

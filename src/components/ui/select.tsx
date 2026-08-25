@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +27,7 @@ export function Select({
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
+  const listboxId = useId().replace(/[^a-zA-Z0-9-]/g, "");
 
   useEffect(() => {
     if (!open) return;
@@ -53,6 +54,7 @@ export function Select({
         type="button"
         role="combobox"
         aria-expanded={open}
+        aria-controls={open ? listboxId : undefined}
         aria-haspopup="listbox"
         onClick={() => setOpen((o) => !o)}
         onKeyDown={(e) => {
@@ -89,6 +91,7 @@ export function Select({
 
       {open && (
         <ul
+          id={listboxId}
           role="listbox"
           aria-labelledby={id}
           className="absolute z-30 mt-1.5 max-h-60 w-full overflow-y-auto rounded-lg border border-line bg-surface p-1 shadow-pop"

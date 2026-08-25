@@ -3,6 +3,7 @@ import { apiKeys } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { decryptSecret } from "@/lib/auth/vault";
 import { PROVIDERS, type ProviderId } from "./registry";
+import { resolveDefaultModel } from "./discover";
 import type { ResolvedCredential } from "./client";
 
 /**
@@ -10,18 +11,19 @@ import type { ResolvedCredential } from "./client";
  *  1. Per-request headers: x-cognifina-provider / x-custom-api-key / x-custom-base-url
  *  2. User vault (AES-256-GCM encrypted rows in Postgres)
  *  3. Server environment fallback
+ * The model is never hardcoded: when the user hasn't pinned one, the first
+ * model the key can access (live /models listing) is used.
  */
 
-export function credentialFromHeaders(headers: Headers): ResolvedCredential | null {
+export function credentialFromHeaders(headers: Headers): Omit<ResolvedCredential, "model"> & { model: string | null } {
   const providerName = headers.get("x-cognifina-provider");
-  if (!providerName) return null;
+  if (!providerName) return null as unknown as ReturnType<typeof credentialFromHeaders>;
   const spec = PROVIDERS[providerName as ProviderId];
-  if (!spec) return null;
+  if (!spec) return null as unknown as ReturnType<typeof credentialFromHeaders>;
   const apiKey = headers.get("x-custom-api-key") || null;
   const baseUrl = headers.get("x-custom-base-url");
-  const model =
-    headers.get("x-custom-model") || (spec.models.length > 0 ? spec.models[0].id : "gpt-4o-mini");
-  if (!apiKey && providerName !== "ollama") return null;
+  const model = headers.get("x-custom-model") || null;
+  if (!apiKey && providerName !== "ollama") return null as unknown as ReturnType<typeof credentialFromHeaders>;
   return { provider: providerName as ProviderId, apiKey, baseUrl, model };
 }
 
@@ -31,7 +33,12 @@ export async function resolveCredential(opts: {
 }): Promise<ResolvedCredential | null> {
   // 1) request-level overrides
   const headerCred = opts.headers ? credentialFromHeaders(opts.headers) : null;
-  if (headerCred?.apiKey || headerCred?.provider === "ollama") return headerCred;
+  if (headerCred?.apiKey || headerCred?.provider === "ollama") {
+    if (headerCred.model) return headerCred as ResolvedCredential;
+    const spec = PROVIDERS[headerCred.provider];
+    const model = await resolveDefaultModel(spec.api, headerCred.baseUrl ?? spec.defaultBaseUrl ?? "", headerCred.apiKey ?? "ollama");
+    return { ...headerCred, model } as ResolvedCredential;
+  }
 
   // 2) user's saved vault keys, in registry priority order
   const rows = await db.select().from(apiKeys).where(eq(apiKeys.userId, opts.userId));
@@ -41,12 +48,9 @@ export async function resolveCredential(opts: {
     const spec = PROVIDERS[provider];
     try {
       const apiKey = decryptSecret(row.encryptedKey);
-      return {
-        provider,
-        apiKey,
-        baseUrl: row.baseUrl ?? spec.defaultBaseUrl ?? null,
-        model: row.defaultModel ?? spec.models[0]?.id ?? "",
-      };
+      const baseUrl = row.baseUrl ?? spec.defaultBaseUrl ?? null;
+      const model = row.defaultModel ?? (await resolveDefaultModel(spec.api, baseUrl ?? "", apiKey));
+      return { provider, apiKey, baseUrl, model };
     } catch {
       continue; // corrupted entry — try next
     }
@@ -56,12 +60,11 @@ export async function resolveCredential(opts: {
   for (const provider of Object.keys(PROVIDERS) as ProviderId[]) {
     const envVar = PROVIDERS[provider].envKey;
     if (envVar && process.env[envVar]) {
-      return {
-        provider,
-        apiKey: process.env[envVar] as string,
-        baseUrl: PROVIDERS[provider].defaultBaseUrl ?? null,
-        model: PROVIDERS[provider].models[0]?.id ?? "",
-      };
+      const spec = PROVIDERS[provider];
+      const apiKey = process.env[envVar] as string;
+      const baseUrl = spec.defaultBaseUrl ?? null;
+      const model = await resolveDefaultModel(spec.api, baseUrl ?? "", apiKey);
+      return { provider, apiKey, baseUrl, model };
     }
   }
   return null;

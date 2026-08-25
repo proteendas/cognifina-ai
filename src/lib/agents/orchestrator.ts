@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { runs, textBlocks, documents } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { runs, textBlocks, documents, findings, forensicMetrics } from "@/db/schema";
+import { eq, asc } from "drizzle-orm";
 import { resolveCredential } from "@/lib/ai/keys";
 import { loadRunContext, type RunContext } from "./context";
 import { runIngestion } from "./ingestion";
@@ -151,7 +151,6 @@ export async function answerRunQuestion(
 
   // Deterministic metrics join the pack as authoritative context (no seg ids —
   // they are engine outputs, not document excerpts).
-  const { forensicMetrics } = await import("@/db/schema");
   const metricRows = await db
     .select({ ref: forensicMetrics.ref, displayName: forensicMetrics.displayName, verdict: forensicMetrics.verdict, detailMd: forensicMetrics.detailMd })
     .from(forensicMetrics)
@@ -160,8 +159,37 @@ export async function answerRunQuestion(
     ? `COMPUTED METRICS (authoritative, produced by the deterministic engines):\n${metricRows.map((m) => `• [${m.ref}] ${m.displayName}: ${m.verdict} — ${m.detailMd}`).join("\n")}\n\n`
     : "";
 
+  // The run's findings are authoritative too — questions like "what are the
+  // most severe findings" must be answerable even when no document passage
+  // lexically matches.
+  const findingRows = await db
+    .select({
+      ref: findings.ref,
+      title: findings.title,
+      severity: findings.severity,
+      category: findings.category,
+      description: findings.description,
+      recommendation: findings.recommendation,
+    })
+    .from(findings)
+    .where(eq(findings.runId, ctx.runId))
+    .orderBy(asc(findings.ref));
+  const severityOrder = { critical: 0, high: 1, medium: 2, low: 3, info: 4 } as const;
+  const rankedFindings = [...findingRows].sort(
+    (a, b) => severityOrder[a.severity] - severityOrder[b.severity] || a.ref.localeCompare(b.ref)
+  );
+  const findingContext = rankedFindings.length
+    ? `RUN FINDINGS (authoritative, severity-ranked by the engines — most severe first):\n${rankedFindings
+        .map(
+          (f) =>
+            `• [${f.ref}] ${f.severity.toUpperCase()} — ${f.title} (${f.category}): ${f.description}${f.recommendation ? ` Recommended action: ${f.recommendation}` : ""}`
+        )
+        .join("\n")}\n\n`
+    : "";
+
   const citationIndex = new Map<string, RunChatCitation>();
   const packText =
+    findingContext +
     metricContext +
     packSegments
       .map((s) => {
@@ -203,10 +231,26 @@ export async function answerRunQuestion(
   }
 
   // Deterministic extractive fallback / refusal
-  if (top.length === 0 && metricRows.length === 0) {
+  if (top.length === 0 && metricRows.length === 0 && rankedFindings.length === 0) {
     return {
       content:
         "I can only answer using the evidence ingested in this run. Your question does not match any extracted passage with sufficient confidence — please upload relevant documents or re-run analysis.",
+      citations: [],
+    };
+  }
+
+  // No lexical passage hits, but the engines produced authoritative outputs —
+  // answer deterministically from findings/metrics instead of refusing.
+  if (top.length === 0) {
+    const topFindings = rankedFindings.slice(0, 5);
+    const findingsList = topFindings
+      .map((f) => `• [${f.ref}] ${f.severity.toUpperCase()} — ${f.title}: ${f.description}`)
+      .join("\n");
+    const metricSummary = metricRows.length
+      ? `\n\nComputed metrics for reference: ${metricRows.map((m) => `${m.displayName} (${m.verdict})`).join("; ")}.`
+      : "";
+    return {
+      content: `No language model is connected to this workspace, so here is a deterministic summary from the run's computed results:\n\n${findingsList}${metricSummary}`,
       citations: [],
     };
   }

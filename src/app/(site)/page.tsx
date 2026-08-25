@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Binary, KeyRound, Lock, Network, Quote, RefreshCcw, Workflow } from "lucide-react";
+import { ArrowRight, Binary, Cpu, FileCheck2, FileUp, Lock, Network, Quote, RefreshCcw, Scale, Workflow } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RiskGauge } from "@/components/visualizers/RiskGauge";
@@ -118,6 +118,77 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ---------------- how it works ---------------- */}
+      <section className="border-t border-line bg-paper-2">
+        <SectionShell>
+          <Reveal>
+            <p className="eyebrow text-center">How it works</p>
+            <h2 className="display-md mt-2 text-center text-balance text-ink">
+              You pick the report. The harness compiles the run.
+            </h2>
+          </Reveal>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              [Workflow, "Choose a workflow", "Declare the report you need — due diligence, statutory audit review, KYC/AML. The plan is fixed before any document is read."],
+              [FileUp, "Upload the evidence", "Drop statements, ledgers and filings. Every page of every file is parsed — no sampling."],
+              [Cpu, "The run executes", "Six specialist agents extract, test and verify in a fixed order — deterministic math before any model is consulted."],
+              [FileCheck2, "Read a defensible report", "Ranked findings, a weighted risk score and a citation on every claim — down to the page and bounding box."],
+            ].map(([Icon, title, body], i) => (
+              <Reveal key={title as string} delay={i * 0.05} className="h-full">
+                <div className="flex h-full flex-col rounded-xl border border-line bg-surface p-5 shadow-soft transition-shadow hover:shadow-lift">
+                  <div className="flex items-center justify-between">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
+                      <Icon size={17} />
+                    </span>
+                    <span className="tnum font-mono text-[11px] font-medium text-ink-4">{String(i + 1).padStart(2, "0")}</span>
+                  </div>
+                  <h3 className="title-sm mt-4 text-ink">{title as string}</h3>
+                  <p className="body-sm mt-1.5">{body as string}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+          <Reveal delay={0.15}>
+            <p className="mt-8 text-center">
+              <Link href="/pipeline" className="group inline-flex items-center gap-1.5 text-[14px] font-medium text-accent hover:underline">
+                See the full architecture
+                <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </p>
+          </Reveal>
+        </SectionShell>
+      </section>
+
+      {/* ---------------- the problem ---------------- */}
+      <section className="border-t border-line">
+        <SectionShell>
+          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
+            <Reveal>
+              <p className="eyebrow">The problem</p>
+              <h2 className="display-md mt-2 text-balance text-ink">The file grows. The deadline doesn&apos;t.</h2>
+              <p className="lede mt-3 max-w-md">
+                Serious financial review is still a weeks-long, human-hours business — and the failure mode is silent: things get missed.
+              </p>
+            </Reveal>
+            <div className="space-y-5">
+              {[
+                ["How long does a serious review take?", "Three to six weeks of analyst time per target — and the queue rarely stays at one target."],
+                ["What does expertise cost?", "Forensic accountants bill $500–$1,500 an hour, and much of that time is mechanical cross-checking."],
+                ["What actually gets missed?", "Cross-document patterns: a number that disagrees between versions, a receivable that inflates overnight, a round-sum journal posted on a Sunday."],
+                ["What about multi-entity work?", "Each extra entity multiplies the checklist — ownership chains, registry filings, related-party webs."],
+              ].map(([q, a], i) => (
+                <Reveal key={q} delay={i * 0.04}>
+                  <div className="rounded-xl border border-line bg-surface p-5 shadow-soft">
+                    <p className="text-[14px] font-semibold text-ink">{q}</p>
+                    <p className="mt-1.5 font-secondary text-[13.5px] leading-relaxed text-ink-3">{a}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </SectionShell>
+      </section>
+
       {/* ---------------- teasers → real pages ---------------- */}
       {TEASERS.map((t) => (
         <SectionShell key={t.href} className="!py-6">
@@ -143,26 +214,33 @@ export default function HomePage() {
         </SectionShell>
       ))}
 
-      {/* proof strip */}
-      <SectionShell className="!pb-24 !pt-8">
-        <Reveal>
-          <div className="grid gap-4 sm:grid-cols-3">
+      {/* ---------------- what makes us different ---------------- */}
+      <section className="border-t border-line bg-paper-2">
+        <SectionShell className="!pb-20 !pt-12">
+          <Reveal>
+            <p className="eyebrow text-center">The difference</p>
+            <h2 className="display-md mt-2 text-center text-balance text-ink">What Cognifina does differently</h2>
+          </Reveal>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              [RefreshCcw, "Bit-for-bit reruns", "Same inputs reproduce identical metrics, findings and ledger."],
-              [Quote, "Every claim cited", "Document · page · excerpt · bounding box — bound to each finding."],
-              [KeyRound, "Zero model lock-in", "OpenAI, Claude, Gemini, Groq, DeepSeek, Mistral or local Ollama."],
-            ].map(([Icon, t, b]) => (
-              <div key={t as string} className="rounded-xl border border-line bg-surface p-5 shadow-soft transition-shadow hover:shadow-lift">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
-                  <Icon size={17} />
-                </span>
-                <h3 className="title-sm mt-4 text-ink">{t as string}</h3>
-                <p className="body-sm mt-1.5">{b as string}</p>
-              </div>
+              [RefreshCcw, "Reproducible by design", "Same evidence, same scope → identical score, findings and ledger. Bit-for-bit, every rerun."],
+              [Binary, "Math before models", "Benford, Beneish, Altman and seeded forests compute first. Models only assist — never originate a number."],
+              [Quote, "Cited to the page", "Every claim carries document · page · excerpt · bounding box. The citation drawer re-renders the proof."],
+              [Scale, "Honest about gaps", "Missing evidence, scanned pages and sequence breaks are reported as findings — never silently skipped."],
+            ].map(([Icon, t, b], i) => (
+              <Reveal key={t as string} delay={i * 0.05} className="h-full">
+                <div className="h-full rounded-xl border border-line bg-surface p-6 shadow-soft transition-shadow hover:shadow-lift">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
+                    <Icon size={17} />
+                  </span>
+                  <h3 className="title-sm mt-4 text-ink">{t as string}</h3>
+                  <p className="body-sm mt-1.5">{b as string}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
-        </Reveal>
-      </SectionShell>
+        </SectionShell>
+      </section>
 
       <CtaBand />
     </>

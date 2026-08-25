@@ -10,7 +10,10 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "test:metrics": "node --test scripts/test-admin-metrics.mjs",
+    "test:security": "node scripts/test-admin-security.mjs",
+    "test-docs": "node scripts/generate-test-docs.mjs"
   },
   "dependencies": {
     "@xyflow/react": "^12.3.5",

@@ -18,7 +18,7 @@ export type AdminPermission =
   | "insights.manage";
 
 /** Granular permission model — extend the map when new roles are introduced. */
-export const ROLE_PERMISSIONS: Record<"USER" | "SUPER_ADMIN", AdminPermission[] | []> = {
+export const ROLE_PERMISSIONS: Record<"USER" | "SUPER_ADMIN", AdminPermission[]> = {
   USER: [],
   SUPER_ADMIN: [
     "analytics.view",

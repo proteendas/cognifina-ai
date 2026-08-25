@@ -13,6 +13,7 @@ export type ProviderSpec = {
   api: "openai-compatible" | "anthropic" | "google";
   defaultBaseUrl?: string;
   envKey?: string;
+  /** Intentionally empty — model lists are fetched live from the provider with the user's key. */
   models: { id: string; label: string }[];
   docsUrl: string;
 };
@@ -24,10 +25,7 @@ export const PROVIDERS: Record<ProviderId, ProviderSpec> = {
     api: "openai-compatible",
     defaultBaseUrl: "https://api.openai.com/v1",
     envKey: "OPENAI_API_KEY",
-    models: [
-      { id: "gpt-4o", label: "GPT-4o" },
-      { id: "gpt-4o-mini", label: "GPT-4o mini" },
-    ],
+    models: [],
     docsUrl: "https://platform.openai.com/api-keys",
   },
   anthropic: {
@@ -35,10 +33,7 @@ export const PROVIDERS: Record<ProviderId, ProviderSpec> = {
     label: "Anthropic Claude",
     api: "anthropic",
     envKey: "ANTHROPIC_API_KEY",
-    models: [
-      { id: "claude-3-5-sonnet-latest", label: "Claude 3.5 Sonnet" },
-      { id: "claude-3-5-haiku-latest", label: "Claude 3.5 Haiku" },
-    ],
+    models: [],
     docsUrl: "https://console.anthropic.com/settings/keys",
   },
   google: {
@@ -46,10 +41,7 @@ export const PROVIDERS: Record<ProviderId, ProviderSpec> = {
     label: "Google Gemini",
     api: "google",
     envKey: "GOOGLE_GENERATIVE_AI_API_KEY",
-    models: [
-      { id: "gemini-2.0-flash", label: "Gemini 2.0 Flash" },
-      { id: "gemini-1.5-pro", label: "Gemini 1.5 Pro" },
-    ],
+    models: [],
     docsUrl: "https://aistudio.google.com/app/apikey",
   },
   groq: {
@@ -58,7 +50,7 @@ export const PROVIDERS: Record<ProviderId, ProviderSpec> = {
     api: "openai-compatible",
     defaultBaseUrl: "https://api.groq.com/openai/v1",
     envKey: "GROQ_API_KEY",
-    models: [{ id: "llama-3.3-70b-versatile", label: "Llama 3.3 70B" }],
+    models: [],
     docsUrl: "https://console.groq.com/keys",
   },
   deepseek: {
@@ -67,7 +59,7 @@ export const PROVIDERS: Record<ProviderId, ProviderSpec> = {
     api: "openai-compatible",
     defaultBaseUrl: "https://api.deepseek.com/v1",
     envKey: "DEEPSEEK_API_KEY",
-    models: [{ id: "deepseek-chat", label: "DeepSeek Chat (V3)" }],
+    models: [],
     docsUrl: "https://platform.deepseek.com/api_keys",
   },
   mistral: {
@@ -76,7 +68,7 @@ export const PROVIDERS: Record<ProviderId, ProviderSpec> = {
     api: "openai-compatible",
     defaultBaseUrl: "https://api.mistral.ai/v1",
     envKey: "MISTRAL_API_KEY",
-    models: [{ id: "mistral-large-latest", label: "Mistral Large" }],
+    models: [],
     docsUrl: "https://console.mistral.ai/api-keys",
   },
   ollama: {
@@ -84,10 +76,7 @@ export const PROVIDERS: Record<ProviderId, ProviderSpec> = {
     label: "Ollama (local)",
     api: "openai-compatible",
     defaultBaseUrl: process.env.OLLAMA_BASE_URL || "http://localhost:11434/v1",
-    models: [
-      { id: "llama3.1", label: "Llama 3.1" },
-      { id: "qwen2.5", label: "Qwen 2.5" },
-    ],
+    models: [],
     docsUrl: "https://ollama.com",
   },
 };

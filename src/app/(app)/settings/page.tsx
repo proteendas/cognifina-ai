@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, ExternalLink, KeyRound, Loader2, ShieldCheck, Trash2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Select } from "@/components/ui/select";
 import { api } from "@/lib/client";
 import type { ApiKeyDto, ProviderDto } from "@/lib/types";
@@ -78,12 +79,44 @@ function ProviderCard({
   onDeleted: () => void;
 }) {
   const [apiKey, setApiKey] = useState("");
-  const [model, setModel] = useState(saved?.defaultModel || provider.models[0] || "");
+  const [model, setModel] = useState(saved?.defaultModel || "");
   const [baseUrl, setBaseUrl] = useState(saved?.baseUrl || "");
   const [busy, setBusy] = useState<"save" | "test" | "delete" | null>(null);
   const [status, setStatus] = useState<{ ok: boolean; msg: string } | null>(
     saved?.status === "verified" ? { ok: true, msg: `verified ${saved.hint}` } : null
   );
+  const [modelOptions, setModelOptions] = useState<string[]>([]);
+  const [modelState, setModelState] = useState<"idle" | "loading" | "live" | "manual">("idle");
+  const [modelError, setModelError] = useState<string | null>(null);
+
+  const loadModels = async (key?: string, url?: string) => {
+    setModelState("loading");
+    setModelError(null);
+    try {
+      const res = await api.settings.models({ provider: provider.id, apiKey: key || undefined, baseUrl: url ?? baseUrl });
+      if (res.source === "live" && res.models.length > 0) {
+        setModelOptions(res.models);
+        setModelState("live");
+        // if the stored model is no longer offered, snap to the first available
+        setModel((m) => (m && res.models.includes(m) ? m : res.models[0]));
+      } else if (res.source === "error") {
+        setModelState("manual");
+        setModelError(res.error ?? "Could not list models");
+      } else {
+        setModelState("manual");
+      }
+    } catch (e) {
+      setModelState("manual");
+      setModelError(e instanceof Error ? e.message : "Could not list models");
+    }
+  };
+
+  // on mount: a stored key → load its live model list
+  useEffect(() => {
+    if (saved) void loadModels();
+    else setModelState("manual");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saved?.provider]);
 
   const save = async (testFirst: boolean) => {
     if (!apiKey && !saved) return;
@@ -114,7 +147,7 @@ function ProviderCard({
     try {
       await api.settings.deleteKey(provider.id);
       setBaseUrl("");
-      setModel(provider.models[0] || "");
+      setModel("");
       setStatus(null);
       onDeleted();
     } finally {
@@ -161,26 +194,42 @@ function ProviderCard({
       <div className="grid gap-4 p-5 sm:grid-cols-[1fr_170px_150px]">
         <div className="space-y-1.5 sm:col-span-1">
           <Label htmlFor={`${provider.id}-key`}>API key</Label>
-          <Input
+          <PasswordInput
             id={`${provider.id}-key`}
-            type="password"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
+            onBlur={() => {
+              const key = apiKey.trim();
+              if (key.length >= 20) void loadModels(key);
+            }}
             placeholder={saved ? "•••••••• (stored — paste to replace)" : "Paste key…"}
             autoComplete="off"
           />
+          {!saved && <p className="font-secondary text-[11.5px] text-ink-4">Models load automatically from the provider once a key is pasted.</p>}
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor={`${provider.id}-model`}>Default model</Label>
-          {provider.models.length > 0 ? (
-            <Select
-              id={`${provider.id}-model`}
-              options={[...new Set([...provider.models, ...(model && !provider.models.includes(model) ? [model] : [])])]}
-              value={model}
-              onChange={setModel}
-            />
+          <Label htmlFor={`${provider.id}-model`}>
+            Default model{" "}
+            <span className="ml-1 font-normal text-ink-4">
+              {modelState === "loading" ? "· loading from provider…" : modelState === "live" ? `· ${modelOptions.length} available for this key` : ""}
+            </span>
+          </Label>
+          {modelState === "loading" ? (
+            <div className="flex h-10 items-center gap-2 rounded-lg border border-line-strong bg-surface-2 px-3.5 text-sm text-ink-4">
+              <Loader2 size={14} className="animate-spin" /> Fetching models with this key…
+            </div>
+          ) : modelState === "live" ? (
+            <Select id={`${provider.id}-model`} options={modelOptions} value={model} onChange={setModel} />
           ) : (
-            <Input value={model} onChange={(e) => setModel(e.target.value)} placeholder="model id" />
+            <>
+              <Input
+                id={`${provider.id}-model`}
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+                placeholder={saved ? "model id (e.g. from provider console)" : "paste a key above to load models"}
+              />
+              {modelError && <p className="font-secondary text-[11.5px] text-warning">{modelError} — enter the model id manually.</p>}
+            </>
           )}
         </div>
         <div className="space-y-1.5">

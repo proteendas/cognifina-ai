@@ -1,13 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
-import { AlertTriangle, FileText, Layers, Loader2, Table2 } from "lucide-react";
+import { AlertTriangle, Download, FileText, Layers, Loader2, Table2 } from "lucide-react";
 import { useRun } from "@/components/dashboard/RunContext";
 import { StageProgress } from "@/components/dashboard/StageProgress";
 import { FindingsList } from "@/components/dashboard/FindingsList";
 import { RiskGauge } from "@/components/visualizers/RiskGauge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { downloadReport } from "@/lib/report-export";
 import type { CitationDto, Severity } from "@/lib/types";
 
 export default function RunOverviewPage() {
@@ -111,11 +112,24 @@ export default function RunOverviewPage() {
       {/* report */}
       {data.run.reportMd && (
         <details className="group overflow-hidden rounded-xl border border-line bg-surface shadow-soft">
-          <summary className="pressable cursor-pointer list-none px-5 py-4 text-[13.5px] font-semibold text-ink [&::-webkit-details-marker]:hidden">
-            Forensic report (markdown)
-            <span className="ml-2 text-[11px] font-normal uppercase tracking-wider text-accent opacity-0 transition-opacity group-open:opacity-100">
-              open
+          <summary className="pressable flex cursor-pointer list-none items-center gap-3 px-5 py-4 text-[13.5px] font-semibold text-ink [&::-webkit-details-marker]:hidden">
+            <span className="flex-1">
+              Forensic report (markdown)
+              <span className="ml-2 text-[11px] font-normal uppercase tracking-wider text-accent opacity-0 transition-opacity group-open:opacity-100">
+                open
+              </span>
             </span>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                downloadReport(data);
+              }}
+              className="pressable inline-flex items-center gap-1.5 rounded-lg border border-line-strong bg-surface px-2.5 py-1.5 text-[12px] font-medium text-ink-2 hover:bg-surface-2 hover:text-ink"
+              title="Download the full report with citation annexure"
+            >
+              <Download size={13} /> Export .md
+            </button>
           </summary>
           <div className="report-md max-h-[480px] overflow-y-auto border-t border-line px-5 py-4 text-[13.5px]" dangerouslySetInnerHTML={{ __html: renderMarkdownLite(data.run.reportMd) }} />
         </details>
