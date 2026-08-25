@@ -82,6 +82,3 @@ export function BenfordDeviationStrip({ perDigit }: { perDigit: BenfordDigitStat
     </div>
   );
 }
-
-// ReferenceLine kept import-compatible for potential threshold overlays
-void ReferenceLine;

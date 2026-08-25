@@ -90,8 +90,8 @@ export default function WorkflowsPage() {
                 <Badge>{w.category}</Badge>
                 <h2 className="mt-3 text-[15px] font-semibold leading-snug tracking-tight text-ink">{w.name}</h2>
                 <p className="mt-1.5 line-clamp-3 flex-1 font-secondary text-[13px] leading-relaxed text-ink-3">{w.description}</p>
-                <span className="mt-4 flex items-center gap-1.5 text-[12.5px] font-medium text-accent opacity-0 transition-opacity group-hover:opacity-100">
-                  Open workflow <ArrowRight size={13} />
+                <span className="mt-4 flex items-center gap-1.5 text-[12.5px] font-medium text-accent">
+                  Open workflow <ArrowRight size={13} className="transition-transform duration-150 group-hover:translate-x-0.5" />
                 </span>
               </Link>
             </motion.div>

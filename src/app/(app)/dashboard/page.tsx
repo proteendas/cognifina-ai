@@ -25,8 +25,9 @@ import { Skeleton } from "@/components/ui/progress";
 import { api } from "@/lib/client";
 import type { AuditEventDto, UsageStatsDto } from "@/lib/types";
 import { timeAgo, formatDate } from "@/lib/utils";
+import type { LucideIcon } from "lucide-react";
 
-const AUDIT_META: Record<string, { label: string; icon: React.ComponentType<{ size?: number; className?: string }> }> = {
+const AUDIT_META: Record<string, { label: string; icon: LucideIcon }> = {
   "account.created": { label: "Workspace created", icon: Sparkles },
   "auth.login": { label: "Signed in", icon: LogIn },
   "auth.logout": { label: "Signed out", icon: LogOut },
@@ -228,7 +229,7 @@ function StatCard({
   value,
   sub,
 }: {
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: LucideIcon;
   label: string;
   value: number | string;
   sub: string;
